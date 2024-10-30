@@ -1,5 +1,7 @@
 package com.qpeterp.fitbattle.presentation.features.main.screen
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -100,7 +102,9 @@ fun MainNavHost(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = NavGroup.Main.HOME
+        startDestination = NavGroup.Main.HOME,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }
     ) {
         composable(NavGroup.Main.HOME) {
             HomeScreen(navController, homeViewModel)
