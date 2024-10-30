@@ -34,9 +34,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.qpeterp.fitbattle.presentation.features.main.battle.screen.BattleScreen
+import com.qpeterp.fitbattle.presentation.features.main.battle.viewmodel.BattleViewModel
 import com.qpeterp.fitbattle.presentation.features.main.home.screen.HomeScreen
 import com.qpeterp.fitbattle.presentation.features.main.home.viewmodel.HomeViewModel
-import com.qpeterp.fitbattle.presentation.features.main.viewmodel.MainViewModel
+import com.qpeterp.fitbattle.presentation.features.main.profile.screen.ProfileScreen
+import com.qpeterp.fitbattle.presentation.features.main.profile.viewmodel.ProfileViewModel
+import com.qpeterp.fitbattle.presentation.features.main.ranking.screen.RankingScreen
+import com.qpeterp.fitbattle.presentation.features.main.ranking.viewmodel.RankingViewModel
 import com.qpeterp.fitbattle.presentation.root.navigation.NavGroup
 import com.qpeterp.fitbattle.presentation.theme.Colors
 
@@ -89,6 +94,10 @@ fun MainScreen(
 @Composable
 fun MainNavHost(navController: NavHostController) {
     val homeViewModel: HomeViewModel = viewModel()
+    val battleViewModel: BattleViewModel = viewModel()
+    val rankingViewModel: RankingViewModel = viewModel()
+    val profileViewModel: ProfileViewModel = viewModel()
+
     NavHost(
         navController = navController,
         startDestination = NavGroup.Main.HOME
@@ -96,9 +105,15 @@ fun MainNavHost(navController: NavHostController) {
         composable(NavGroup.Main.HOME) {
             HomeScreen(navController, homeViewModel)
         }
-//        composable(NavGroup.Main.BATTLE) { BattleScreen() }
-//        composable(NavGroup.Main.RANKING) { RankingScreen() }
-//        composable(NavGroup.Main.PROFILE) { ProfileScreen() }
+        composable(NavGroup.Main.BATTLE) {
+            BattleScreen(navController, battleViewModel)
+        }
+        composable(NavGroup.Main.RANKING) {
+            RankingScreen(navController, rankingViewModel)
+        }
+        composable(NavGroup.Main.PROFILE) {
+            ProfileScreen(navController, profileViewModel)
+        }
     }
 }
 
