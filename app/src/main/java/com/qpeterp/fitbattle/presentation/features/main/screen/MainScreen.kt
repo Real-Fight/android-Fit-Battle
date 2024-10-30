@@ -3,12 +3,14 @@ package com.qpeterp.fitbattle.presentation.features.main.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -16,6 +18,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -36,6 +40,7 @@ import com.qpeterp.fitbattle.presentation.features.main.viewmodel.MainViewModel
 import com.qpeterp.fitbattle.presentation.root.navigation.NavGroup
 import com.qpeterp.fitbattle.presentation.theme.Colors
 
+@ExperimentalMaterial3Api
 @Composable
 fun MainScreen(
     navController: NavController, // 외부에서 전달된 navController 사용
@@ -43,9 +48,33 @@ fun MainScreen(
 ) {
     // NavHostController 생성
     val mainNavController = rememberNavController()
+    val selectedItem by remember { mutableStateOf(NavGroup.Main.HOME) }
 
     Scaffold(
-        bottomBar = { MyBottomNavigation(mainNavController) } // mainNavController를 하위 NavController에 사용
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        when (selectedItem) {
+                            NavGroup.Main.HOME -> "홈"
+                            NavGroup.Main.BATTLE -> "운동한판"
+                            NavGroup.Main.RANKING -> "운동랭킹"
+                            NavGroup.Main.PROFILE -> "프로필"
+                            else -> ""
+                        },
+                        color = Color.Black,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        bottomBar = {
+            MyBottomNavigation(mainNavController) {
+
+            }
+        } // mainNavController를 하위 NavController에 사용
     ) { padding ->
         Box(
             modifier = Modifier
@@ -75,7 +104,7 @@ fun MainNavHost(navController: NavHostController) {
 }
 
 @Composable
-fun MyBottomNavigation(navController: NavController) {
+fun MyBottomNavigation(navController: NavController, selectItem: (String) -> Unit) {
     val items = listOf(
         NavGroup.Main.HOME,
         NavGroup.Main.BATTLE,
@@ -85,7 +114,10 @@ fun MyBottomNavigation(navController: NavController) {
     // 선택된 아이템을 저장할 상태 변수
     var selectedItem by remember { mutableStateOf(NavGroup.Main.HOME) }
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = Colors.White,
+        contentColor = Colors.White
+    ) {
         items.forEach { item ->
             NavigationBarItem(
                 icon = {
@@ -118,6 +150,7 @@ fun MyBottomNavigation(navController: NavController) {
                 selected = selectedItem == item, // 현재 선택된 아이템 확인
                 onClick = {
                     selectedItem = item // 클릭 시 선택된 아이템 업데이트
+                    selectItem(selectedItem)
                     navController.navigate(item) {
                         // 모든 기존 스택을 지우고 새 목적지로 이동
                         popUpTo(NavGroup.Main.MAIN) { inclusive = true }
@@ -127,7 +160,8 @@ fun MyBottomNavigation(navController: NavController) {
                     selectedIconColor = Colors.LightPrimaryColor, // 선택된 아이콘 색상
                     unselectedIconColor = Color.Black, // 비선택 아이콘 색상
                     selectedTextColor = Color.White, // 선택된 텍스트 색상
-                    unselectedTextColor = Color.Gray // 비선택 텍스트 색상
+                    unselectedTextColor = Color.Gray, // 비선택 텍스트 색상
+                    indicatorColor = Colors.DarkPrimaryColorLight
                 )
             )
         }
