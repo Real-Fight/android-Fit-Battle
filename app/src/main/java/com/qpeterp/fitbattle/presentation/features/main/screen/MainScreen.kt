@@ -21,6 +21,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +75,9 @@ fun MainScreen(
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Colors.BackgroundColor
+                ),
             )
         },
         bottomBar = {
@@ -86,7 +90,7 @@ fun MainScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(Colors.White)
+                .background(Colors.BackgroundColor)
         ) {
             MainNavHost(mainNavController) // 하위 NavHostController 사용
         }
