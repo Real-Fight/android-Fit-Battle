@@ -12,8 +12,8 @@ object Colors {
     val DarkPrimaryColorLight = Color(0xFFFFE5D7)    // 밝은 색상
 
     val Black = Color(0xFF000000)
-    val GrayDark = Color(0xFF3A3A3A)
-    val GrayLight = Color(0xFF8C8C8C)
+    val GrayDark = Color(0xFF747474)
+    val GrayLight = Color(0xFFD9D9D9)
     val White = Color(0xFFFFFFFF)
 
     val Red = Color(0xFFFF2525)
