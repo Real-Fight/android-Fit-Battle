@@ -1,5 +1,6 @@
 package com.qpeterp.fitbattle.presentation.root.navigation
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -13,6 +14,7 @@ import com.qpeterp.fitbattle.presentation.features.auth.register.screen.Register
 import com.qpeterp.fitbattle.presentation.features.auth.register.viewmodel.RegisterViewModel
 import com.qpeterp.fitbattle.presentation.features.main.screen.MainScreen
 
+@ExperimentalMaterial3Api
 @Composable
 fun NavigationGraph(
     navController: NavHostController,

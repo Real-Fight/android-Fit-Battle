@@ -44,11 +44,10 @@ import com.qpeterp.fitbattle.presentation.theme.Colors
 @Composable
 fun MainScreen(
     navController: NavController, // 외부에서 전달된 navController 사용
-    viewModel: MainViewModel = viewModel(),
 ) {
     // NavHostController 생성
     val mainNavController = rememberNavController()
-    val selectedItem by remember { mutableStateOf(NavGroup.Main.HOME) }
+    var selectedItem by remember { mutableStateOf(NavGroup.Main.HOME) }
 
     Scaffold(
         topBar = {
@@ -72,7 +71,7 @@ fun MainScreen(
         },
         bottomBar = {
             MyBottomNavigation(mainNavController) {
-
+                selectedItem = it
             }
         } // mainNavController를 하위 NavController에 사용
     ) { padding ->
