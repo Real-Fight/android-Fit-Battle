@@ -50,12 +50,15 @@ android {
 }
 
 dependencies {
+    // coroutine
+    implementation(libs.kotlinx.coroutines.android)
+    // coil image url
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     // icon
     implementation(libs.androidx.material.icons.extended) // 최신 버전 사용
-
     // navigation
     implementation(libs.androidx.navigation.compose)
-
     // viewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
