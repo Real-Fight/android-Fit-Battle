@@ -36,7 +36,7 @@ fun BattleScreen(
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(20.dp)
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
