@@ -82,13 +82,13 @@ fun RankingScreen(
                 Column {
                     Text(
                         text = "이성은이라는 뜻",
-                        fontSize = 16.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Medium,
                         color = Colors.Black
                     )
                     Text(
                         text = "1023",
-                        fontSize = 20.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Medium,
                         color = Colors.LightPrimaryColor
                     )
@@ -123,7 +123,7 @@ fun RankCard(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Colors.White, RoundedCornerShape(12.dp))
-            .padding(20.dp),
+            .padding(horizontal = 20.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -141,7 +141,7 @@ fun RankCard(
                 modifier = Modifier
                     .width(2.dp)
                     .height(40.dp)
-                    .background(color = Colors.GrayDark)
+                    .background(color = Colors.GrayLight)
             )
             AsyncImage(
                 model = ImageRequest
@@ -152,7 +152,7 @@ fun RankCard(
                 contentScale = ContentScale.Crop,
                 imageLoader = ImageLoader(LocalContext.current),
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
             )
             Text(
