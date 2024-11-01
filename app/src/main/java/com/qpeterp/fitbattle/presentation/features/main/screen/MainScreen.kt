@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastForEach
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -140,7 +141,7 @@ fun MyBottomNavigation(navController: NavController, selectItem: (String) -> Uni
         containerColor = Colors.White,
         contentColor = Colors.White
     ) {
-        items.forEach { item ->
+        items.fastForEach { item ->
             NavigationBarItem(
                 icon = {
                     Icon(
@@ -175,7 +176,7 @@ fun MyBottomNavigation(navController: NavController, selectItem: (String) -> Uni
                     selectItem(selectedItem)
                     navController.navigate(item) {
                         // 모든 기존 스택을 지우고 새 목적지로 이동
-                        popUpTo(NavGroup.Main.MAIN) { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
