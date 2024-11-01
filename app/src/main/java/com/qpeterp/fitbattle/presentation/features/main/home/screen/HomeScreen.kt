@@ -169,7 +169,7 @@ private fun TodayMissionButton(
                 painter = painterResource(R.drawable.bac_mission_button),
                 contentScale = ContentScale.Fit,
             )
-            .fitBattleClickable { onClick() }
+            .clickable { onClick() }
     ) {
         Icon(
             imageVector = Icons.Default.ArrowForward,
@@ -194,6 +194,8 @@ private fun TrainingCard(
             .padding(horizontal = 20.dp)
             .padding(bottom = 16.dp)
             .background(Colors.White, RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp))
+            .fitBattleClickable { onClick() }
     ) {
         Row(
             modifier = Modifier
@@ -222,9 +224,7 @@ private fun TrainingCard(
             Icon(
                 imageVector = Icons.Outlined.KeyboardArrowRight,
                 contentDescription = "arrow icon to Training",
-                modifier = Modifier
-                    .size(36.dp)
-                    .fitBattleClickable { onClick() },
+                modifier = Modifier.size(36.dp),
                 tint = Colors.LightPrimaryColor
             )
         }
