@@ -172,6 +172,8 @@ fun MyBottomNavigation(navController: NavController, selectItem: (String) -> Uni
                 },
                 selected = selectedItem == item, // 현재 선택된 아이템 확인
                 onClick = {
+                    if (selectedItem == item) return@NavigationBarItem
+
                     selectedItem = item // 클릭 시 선택된 아이템 업데이트
                     selectItem(selectedItem)
                     navController.navigate(item) {
