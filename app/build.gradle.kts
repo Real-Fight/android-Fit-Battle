@@ -50,6 +50,12 @@ android {
 }
 
 dependencies {
+    // CameraX
+    implementation(libs.androidx.camera.core.v110)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
     // coroutine
     implementation(libs.kotlinx.coroutines.android)
     // coil image url
