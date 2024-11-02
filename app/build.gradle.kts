@@ -50,6 +50,10 @@ android {
 }
 
 dependencies {
+    // pose detection
+    implementation(libs.pose.detection)
+    implementation(libs.pose.detection.accurate)
+
     // CameraX
     implementation(libs.androidx.camera.core.v110)
     implementation(libs.androidx.camera.camera2)
