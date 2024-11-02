@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.BarChart
-import androidx.compose.material.icons.outlined.FitnessCenter
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -146,10 +146,10 @@ fun MyBottomNavigation(navController: NavController, selectItem: (String) -> Uni
                 icon = {
                     Icon(
                         imageVector = when (item) {
-                            NavGroup.Main.HOME -> Icons.Outlined.Home
-                            NavGroup.Main.BATTLE -> Icons.Outlined.FitnessCenter
-                            NavGroup.Main.RANKING -> Icons.Outlined.BarChart
-                            NavGroup.Main.PROFILE -> Icons.Outlined.Person
+                            NavGroup.Main.HOME -> Icons.Filled.Home
+                            NavGroup.Main.BATTLE -> Icons.Filled.FitnessCenter
+                            NavGroup.Main.RANKING -> Icons.Filled.BarChart
+                            NavGroup.Main.PROFILE -> Icons.Filled.Person
                             else -> return@NavigationBarItem
                         },
                         contentDescription = item
