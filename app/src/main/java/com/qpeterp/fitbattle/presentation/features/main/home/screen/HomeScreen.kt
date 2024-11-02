@@ -56,7 +56,7 @@ fun HomeScreen(
             .verticalScroll(
                 state = screenScrollState,
             ),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Box(
             modifier = Modifier
@@ -112,7 +112,7 @@ fun HomeScreen(
             color = Colors.Black,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .padding(horizontal = 20.dp)
         )
 
         Row(
@@ -151,49 +151,51 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 16.dp)
         )
 
-        Text(
-            text = "근력",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Colors.Black,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 16.dp)
-        )
+        Column {
+            Text(
+                text = "근력",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = Colors.Black,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 16.dp)
+            )
 
-        TrainingCard(
-            icon = painterResource(R.drawable.ic_training_strength),
-            title = "푸쉬업 훈련"
-        ) {
+            TrainingCard(
+                icon = painterResource(R.drawable.ic_training_strength),
+                title = "푸쉬업 훈련"
+            ) {
 
-        }
+            }
 
-        TrainingCard(
-            icon = painterResource(R.drawable.ic_training_strength),
-            title = "스쿼트 훈련"
-        ) {
+            TrainingCard(
+                icon = painterResource(R.drawable.ic_training_strength),
+                title = "스쿼트 훈련"
+            ) {
 
-        }
+            }
 
-        Text(
-            text = "체력",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Colors.Black,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-        )
+            Text(
+                text = "체력",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = Colors.Black,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 16.dp)
+            )
 
-        TrainingCard(
-            icon = painterResource(R.drawable.ic_training_stamina),
-            title = "달리기 훈련"
-        ) {
+            TrainingCard(
+                icon = painterResource(R.drawable.ic_training_stamina),
+                title = "달리기 훈련"
+            ) {
 
+            }
         }
     }
 }
