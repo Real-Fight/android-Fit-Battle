@@ -1,9 +1,14 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
 }
+
+val properties = Properties()
+properties.load(project.rootProject.file("local.properties").inputStream())
 
 android {
     namespace = "com.qpeterp.fitbattle"
@@ -23,6 +28,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "${properties["BASE_URL"]}")
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -40,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -58,8 +68,8 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // Retrofit 라이브러리
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.11.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.kotlinx.serialization)
 
     // pose detection
     implementation(libs.pose.detection)
