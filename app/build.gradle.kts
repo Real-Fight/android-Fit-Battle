@@ -53,8 +53,9 @@ android {
 
 dependencies {
     // hilt
-    implementation("com.google.dagger:hilt-android:2.48")
-    ksp("com.google.dagger:hilt-compiler:2.48")
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose) // 최신 버전 사용
+    ksp(libs.hilt.compiler)
 
     // Retrofit 라이브러리
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
