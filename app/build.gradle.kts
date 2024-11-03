@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -52,8 +53,8 @@ android {
 
 dependencies {
     // hilt
-    implementation("com.google.dagger:hilt-android:2.44")
-    ksp("com.google.dagger:hilt-compiler:2.44")
+    implementation("com.google.dagger:hilt-android:2.48")
+    ksp("com.google.dagger:hilt-compiler:2.48")
 
     // Retrofit 라이브러리
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
