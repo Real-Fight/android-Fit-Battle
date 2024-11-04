@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
+    kotlin("plugin.serialization") version "1.9.0" // 사용할 Kotlin 버전으로 변경하세요.
 }
 
 val properties = Properties()
@@ -70,6 +71,7 @@ dependencies {
     // Retrofit 라이브러리
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
 
     // pose detection
     implementation(libs.pose.detection)
