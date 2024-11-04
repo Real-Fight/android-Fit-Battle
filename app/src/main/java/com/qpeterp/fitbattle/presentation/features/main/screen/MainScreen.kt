@@ -1,12 +1,11 @@
 package com.qpeterp.fitbattle.presentation.features.main.screen
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.FitnessCenter
@@ -18,150 +17,118 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEach
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.qpeterp.fitbattle.presentation.features.main.battle.screen.BattleScreen
-import com.qpeterp.fitbattle.presentation.features.main.battle.viewmodel.BattleViewModel
 import com.qpeterp.fitbattle.presentation.features.main.home.screen.HomeScreen
-import com.qpeterp.fitbattle.presentation.features.main.home.viewmodel.HomeViewModel
 import com.qpeterp.fitbattle.presentation.features.main.profile.screen.ProfileScreen
-import com.qpeterp.fitbattle.presentation.features.main.profile.viewmodel.ProfileViewModel
 import com.qpeterp.fitbattle.presentation.features.main.ranking.screen.RankingScreen
-import com.qpeterp.fitbattle.presentation.features.main.ranking.viewmodel.RankingViewModel
-import com.qpeterp.fitbattle.presentation.root.navigation.NavGroup
+import com.qpeterp.fitbattle.presentation.features.main.viewmodel.MainViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
 
 @ExperimentalMaterial3Api
 @Composable
 fun MainScreen(
     navController: NavController, // 외부에서 전달된 navController 사용
+    viewModel: MainViewModel = hiltViewModel()
 ) {
     // NavHostController 생성
-    val mainNavController = rememberNavController()
-    var selectedItem by remember { mutableStateOf(NavGroup.Main.HOME) }
+    val selectedItem = viewModel.selectedTab
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        when (selectedItem) {
-                            NavGroup.Main.HOME -> "홈"
-                            NavGroup.Main.BATTLE -> "운동한판"
-                            NavGroup.Main.RANKING -> "운동랭킹"
-                            NavGroup.Main.PROFILE -> "프로필"
-                            else -> ""
-                        },
-                        color = Color.Black,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Colors.BackgroundColor
-                ),
-            )
-        },
-        bottomBar = {
-            MyBottomNavigation(mainNavController) {
-                selectedItem = it
-            }
-        } // mainNavController를 하위 NavController에 사용
-    ) { padding ->
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = when (selectedItem) {
+                        0 -> "홈"
+                        1 -> "운동한판"
+                        2 -> "운동랭킹"
+                        3 -> "프로필"
+                        else -> ""
+                    },
+                    color = Color.Black,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp),
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Colors.BackgroundColor
+            ),
+        )
         Box(
             modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
+                .fillMaxWidth()
+                .weight(1f)
+                .zIndex(1f)
                 .background(Colors.BackgroundColor)
         ) {
-            MainNavHost(mainNavController) // 하위 NavHostController 사용
+            when (selectedItem) {
+                0 -> HomeScreen(navController)
+                1 -> BattleScreen(navController)
+                2 -> RankingScreen(navController)
+                3 -> ProfileScreen(navController)
+            }
+        }
+        MyBottomNavigation {
+            viewModel.updateSelectedTab(it)
         }
     }
 }
 
 @Composable
-fun MainNavHost(navController: NavHostController) {
-    val homeViewModel: HomeViewModel = viewModel()
-    val battleViewModel: BattleViewModel = viewModel()
-    val rankingViewModel: RankingViewModel = viewModel()
-    val profileViewModel: ProfileViewModel = viewModel()
-
-    NavHost(
-        navController = navController,
-        startDestination = NavGroup.Main.HOME,
-        enterTransition = { EnterTransition.None },
-        exitTransition = { ExitTransition.None }
-    ) {
-        composable(NavGroup.Main.HOME) {
-            HomeScreen(navController, homeViewModel)
-        }
-        composable(NavGroup.Main.BATTLE) {
-            BattleScreen(navController, battleViewModel)
-        }
-        composable(NavGroup.Main.RANKING) {
-            RankingScreen(navController, rankingViewModel)
-        }
-        composable(NavGroup.Main.PROFILE) {
-            ProfileScreen(navController, profileViewModel)
-        }
-    }
-}
-
-@Composable
-fun MyBottomNavigation(navController: NavController, selectItem: (String) -> Unit) {
-    val items = listOf(
-        NavGroup.Main.HOME,
-        NavGroup.Main.BATTLE,
-        NavGroup.Main.RANKING,
-        NavGroup.Main.PROFILE
-    )
+fun MyBottomNavigation(selectItem: (Int) -> Unit) {
+    val items = listOf(0, 1, 2, 3)
     // 선택된 아이템을 저장할 상태 변수
-    var selectedItem by remember { mutableStateOf(NavGroup.Main.HOME) }
+    var selectedItem by remember { mutableIntStateOf(0) }
 
     NavigationBar(
         containerColor = Colors.White,
-        contentColor = Colors.White
+        contentColor = Colors.White,
+        modifier = Modifier.zIndex(2f)
     ) {
         items.fastForEach { item ->
             NavigationBarItem(
                 icon = {
                     Icon(
                         imageVector = when (item) {
-                            NavGroup.Main.HOME -> Icons.Filled.Home
-                            NavGroup.Main.BATTLE -> Icons.Filled.FitnessCenter
-                            NavGroup.Main.RANKING -> Icons.Filled.BarChart
-                            NavGroup.Main.PROFILE -> Icons.Filled.Person
+                            0 -> Icons.Filled.Home
+                            1 -> Icons.Filled.FitnessCenter
+                            2 -> Icons.Filled.BarChart
+                            3 -> Icons.Filled.Person
                             else -> return@NavigationBarItem
                         },
-                        contentDescription = item
+                        contentDescription = null
                     )
                 },
                 label = {
                     Text(
                         text = when (item) {
-                            NavGroup.Main.HOME -> "홈"
-                            NavGroup.Main.BATTLE -> "한판"
-                            NavGroup.Main.RANKING -> "랭킹"
-                            NavGroup.Main.PROFILE -> "프로필"
+                            0 -> "홈"
+                            1 -> "한판"
+                            2 -> "랭킹"
+                            3 -> "프로필"
                             else -> return@NavigationBarItem
                         },
                         style = MaterialTheme.typography.bodyMedium.copy(
@@ -176,10 +143,7 @@ fun MyBottomNavigation(navController: NavController, selectItem: (String) -> Uni
 
                     selectedItem = item // 클릭 시 선택된 아이템 업데이트
                     selectItem(selectedItem)
-                    navController.navigate(item) {
-                        // 모든 기존 스택을 지우고 새 목적지로 이동
-                        popUpTo(0) { inclusive = true }
-                    }
+
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Colors.LightPrimaryColor, // 선택된 아이콘 색상

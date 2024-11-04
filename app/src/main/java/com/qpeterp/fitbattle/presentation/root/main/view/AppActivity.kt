@@ -10,7 +10,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
 import com.qpeterp.fitbattle.presentation.root.navigation.NavigationGraph
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AppActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
