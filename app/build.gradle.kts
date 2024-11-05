@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose) // 최신 버전 사용
     ksp(libs.hilt.compiler)
+    ksp(libs.dagger.compiler) // Dagger compiler
 
     // Retrofit 라이브러리
     implementation(libs.retrofit)
