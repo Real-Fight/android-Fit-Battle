@@ -1,7 +1,6 @@
 package com.qpeterp.fitbattle.presentation.features.auth.login.screen
 
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,9 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,7 +28,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.qpeterp.fitbattle.common.Constant
 import com.qpeterp.fitbattle.presentation.core.component.FitBattleButton
@@ -35,6 +35,9 @@ import com.qpeterp.fitbattle.presentation.core.component.FitBattleTextField
 import com.qpeterp.fitbattle.presentation.extensions.shortToast
 import com.qpeterp.fitbattle.presentation.features.auth.login.viewmodel.LoginViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 @Composable
@@ -42,9 +45,9 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
-    val userId = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-    val errorMessage = remember { mutableStateOf("") }
+    var userId by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     val lastBackPressTime = remember { mutableLongStateOf(0L) } // 마지막 클릭 시간 추적
@@ -101,7 +104,7 @@ fun LoginScreen(
                     FitBattleTextField(
                         label = "아이디",
                         keyboardType = KeyboardType.Text,
-                        onValueChange = { userId.value = it } // 상태 변경 처리
+                        onValueChange = { userId = it } // 상태 변경 처리
                     )
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -109,12 +112,12 @@ fun LoginScreen(
                     FitBattleTextField(
                         label = "비밀번호",
                         keyboardType = KeyboardType.Password,
-                        onValueChange = { password.value = it } // 상태 변경 처리
+                        onValueChange = { password = it } // 상태 변경 처리
                     )
 
-                    if (errorMessage.value.isNotEmpty()) {
+                    if (errorMessage.isNotEmpty()) {
                         Text(
-                            text = errorMessage.value,
+                            text = errorMessage,
                             color = Colors.Red,
                             modifier = Modifier.padding(vertical = 16.dp)
                         )
@@ -126,17 +129,23 @@ fun LoginScreen(
                 FitBattleButton(
                     text = "로그인",
                     onClick = {
-                        viewModel.login(userId.value, password.value,
-                            onLoginSuccess = {
-                                navController.navigate("main") {
-                                    Log.d(Constant.TAG, "로그인 성공")
-                                    popUpTo("login") { inclusive = true }
+                        if (userId.isEmpty() || password.isEmpty()) {
+                            errorMessage = "빈값을 채워주세요."
+                            return@FitBattleButton
+                        }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            viewModel.login(userId, password,
+                                onLoginSuccess = {
+                                    navController.navigate("main") {
+                                        Log.d(Constant.TAG, "로그인 성공")
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                },
+                                onLoginFailure = { message ->
+                                    errorMessage = message
                                 }
-                            },
-                            onLoginFailure = { message ->
-                                errorMessage.value = message
-                            }
-                        )
+                            )
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 )

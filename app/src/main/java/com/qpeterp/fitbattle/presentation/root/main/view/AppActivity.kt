@@ -6,9 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
+import com.qpeterp.fitbattle.application.MyApplication
+import com.qpeterp.fitbattle.application.PreferenceManager
 import com.qpeterp.fitbattle.presentation.root.navigation.NavigationGraph
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,20 +17,26 @@ class AppActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        MyApplication.prefs = PreferenceManager(application)
+        val prefs = MyApplication.prefs
+
+        val isLoggedIn = prefs.token.isNotEmpty()
+
         setContent {
-            MyApp()
+            MyApp(isLoggedIn)
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun MyApp() {
+    fun MyApp(
+        isUserLoggedIn: Boolean
+    ) {
         val navController = rememberNavController()
-        val isUserLoggedIn = remember { mutableStateOf(false) }
 
         NavigationGraph(
             navController = navController,
-            isUserLoggedIn = isUserLoggedIn.value
+            isUserLoggedIn = isUserLoggedIn
         )
     }
 }

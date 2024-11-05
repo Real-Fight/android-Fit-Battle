@@ -1,8 +1,10 @@
-package com.qpeterp.fitbattle.data.repository.auth
+package com.qpeterp.fitbattle.data.repository
 
+import com.qpeterp.fitbattle.data.data.LoginData
 import com.qpeterp.fitbattle.data.data.RegisterData
-import com.qpeterp.fitbattle.data.remote.service.auth.AuthService
-import com.qpeterp.fitbattle.domain.repository.auth.AuthRepository
+import com.qpeterp.fitbattle.data.remote.service.AuthService
+import com.qpeterp.fitbattle.domain.repository.AuthRepository
+import retrofit2.Response
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
@@ -11,16 +13,21 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun login(
         loginId: String,
         password: String
-    ) {
-        authService.login()
+    ): Response<Unit> {
+        return authService.login(
+            LoginData(
+                loginId = loginId,
+                password = password
+            )
+        )
     }
 
     override suspend fun register(
         loginId: String,
         password: String,
         name: String
-    ) {
-        authService.register(
+    ): Response<Unit> {
+        return authService.register(
             RegisterData(
                 loginId = loginId,
                 password = password,
