@@ -1,4 +1,4 @@
-package com.qpeterp.fitbattle.data.data
+package com.qpeterp.fitbattle.data.data.auth
 
 import kotlinx.serialization.Serializable
 

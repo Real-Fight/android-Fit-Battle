@@ -37,7 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.qpeterp.fitbattle.R
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
@@ -47,7 +47,7 @@ import com.qpeterp.fitbattle.presentation.theme.Colors
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val screenScrollState = rememberScrollState()
     val challengeScrollState = rememberScrollState()
