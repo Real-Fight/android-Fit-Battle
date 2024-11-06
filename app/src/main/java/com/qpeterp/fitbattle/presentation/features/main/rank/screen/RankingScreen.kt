@@ -1,4 +1,4 @@
-package com.qpeterp.fitbattle.presentation.features.main.ranking.screen
+package com.qpeterp.fitbattle.presentation.features.main.rank.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,10 +16,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,23 +28,29 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.qpeterp.fitbattle.domain.model.rank.Rank
-import com.qpeterp.fitbattle.presentation.features.main.ranking.viewmodel.RankingViewModel
+import com.qpeterp.fitbattle.presentation.features.main.rank.viewmodel.RankingViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
 
 @Composable
 fun RankingScreen(
     navController: NavController,
-    viewModel: RankingViewModel = viewModel()
+    viewModel: RankingViewModel = hiltViewModel()
 ) {
-    val dummyDataList by viewModel.dummyDataList.collectAsState()
+    // 화면이 처음 생성될 때 getRankingList 호출
+    LaunchedEffect(Unit) {
+        viewModel.getRankingList()
+    }
+
+    val rankingList = viewModel.rankingList
 
     Column(
         modifier = Modifier.padding(horizontal = 20.dp)
@@ -105,11 +112,24 @@ fun RankingScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(dummyDataList) { item ->
-                RankCard(item)
+        if (rankingList.isEmpty()) {
+            Text(
+                text = "랭킹에 등록된 유저가 없습니다.",
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp,
+                color = Colors.GrayDark,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 240.dp),
+                textAlign = TextAlign.Center
+            )
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(rankingList) { item ->
+                    RankCard(item)
+                }
             }
         }
     }
@@ -146,7 +166,7 @@ fun RankCard(
             AsyncImage(
                 model = ImageRequest
                     .Builder(LocalContext.current)
-                    .data(item.profile)
+                    .data(item.profileImgUrl)
                     .build(),
                 contentDescription = "Profile Image",
                 contentScale = ContentScale.Crop,
@@ -164,7 +184,7 @@ fun RankCard(
         }
 
         Text(
-            text = item.score.toString(),
+            text = item.totalPower.toString(),
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = Colors.LightPrimaryColor

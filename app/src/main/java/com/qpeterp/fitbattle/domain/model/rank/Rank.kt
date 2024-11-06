@@ -1,11 +1,15 @@
 package com.qpeterp.fitbattle.domain.model.rank
 
-import com.qpeterp.fitbattle.domain.model.user.User
+import com.qpeterp.fitbattle.data.data.serializer.UUIDSerializer
+import kotlinx.serialization.Serializable
+import java.util.UUID
 
+// Domain 에 @Serializable 한번만..
+@Serializable
 data class Rank(
-    val ranking: Int,
-    val profile: String,
+    @Serializable(with = UUIDSerializer::class) val id: UUID,
     val name: String,
-//    val user: User,
-    val score: Long
+    val profileImgUrl: String,
+    val ranking: Int,
+    val totalPower: Int
 )
