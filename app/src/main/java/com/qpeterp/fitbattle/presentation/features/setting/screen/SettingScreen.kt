@@ -12,14 +12,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,6 +50,8 @@ fun SettingScreen(
     navController: NavController,
     viewModel: SettingViewModel = hiltViewModel()
 ) {
+    var ttsState by remember { mutableStateOf(viewModel.ttsState) }
+
     Column(
         modifier = Modifier
             .padding(top = 20.dp)
@@ -78,21 +87,34 @@ fun SettingScreen(
             ) {
                 SettingCard(
                     icon = Icons.Outlined.Visibility,
-                    content = "개인 정보 정책",
-                    actionType = ActionType.ARROW
+                    label = "개인 정보 정책",
+                    actionType = ActionType.ARROW,
+                    onClick = {
+                    }
                 ) {
-
+                    Icon(
+                        imageVector = Icons.Default.ArrowForwardIos,
+                        contentDescription = "Arrow icon",
+                        tint = Colors.GrayLight
+                    )
                 }
-                Spacer(modifier = Modifier
-                    .height(1.dp)
-                    .fillMaxWidth()
-                    .background(Colors.GrayLight))
+                Spacer(
+                    modifier = Modifier
+                        .height(1.dp)
+                        .fillMaxWidth()
+                        .background(Colors.GrayLight)
+                )
                 SettingCard(
                     icon = Icons.Outlined.Info,
-                    content = "앱 정보",
-                    actionType = ActionType.ARROW
+                    label = "앱 정보",
+                    actionType = ActionType.ARROW,
+                    onClick = {}
                 ) {
-
+                    Icon(
+                        imageVector = Icons.Default.ArrowForwardIos,
+                        contentDescription = "Arrow icon",
+                        tint = Colors.GrayLight
+                    )
                 }
             }
         }
@@ -119,10 +141,25 @@ fun SettingScreen(
                     icon = Icons.Outlined.Mic,
                     iconColor = Colors.Green,
                     iconBackgroundColor = Colors.LightGreen,
-                    content = "음성 옵션(TTS)",
-                    actionType = ActionType.SWITCH
+                    label = "음성 옵션(TTS)",
+                    actionType = ActionType.SWITCH,
+                    onClick = {}
                 ) {
-
+                    Switch(
+                        checked = ttsState,
+                        onCheckedChange = {
+                            ttsState = it
+                            viewModel.updateTtsState(it)
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Colors.White,
+                            uncheckedThumbColor = Colors.White,
+                            checkedTrackColor = Colors.LightPrimaryColor,
+                            uncheckedTrackColor = Colors.GrayDark,
+                            checkedBorderColor = Colors.Transparent,
+                            uncheckedBorderColor = Colors.Transparent
+                        )
+                    )
                 }
             }
         }
@@ -149,28 +186,30 @@ fun SettingScreen(
                     icon = Icons.Outlined.Logout,
                     iconColor = Colors.Red,
                     iconBackgroundColor = Colors.LightRed,
-                    content = "로그아웃",
-                    actionType = ActionType.NONE
-                ) {
-                    MyApplication.prefs.clearToken()
-                    navController.navigate("login") {
-                        popUpTo(0)
+                    label = "로그아웃",
+                    actionType = ActionType.NONE,
+                    onClick = {
+                        MyApplication.prefs.clearToken()
+                        navController.navigate("login") {
+                            popUpTo(0)
+                        }
                     }
-                }
-                Spacer(modifier = Modifier
-                    .height(1.dp)
-                    .fillMaxWidth()
-                    .background(Colors.GrayLight))
+                ) {}
+                Spacer(
+                    modifier = Modifier
+                        .height(1.dp)
+                        .fillMaxWidth()
+                        .background(Colors.GrayLight)
+                )
                 SettingCard(
                     icon = Icons.Outlined.Delete,
                     iconColor = Colors.Red,
                     iconBackgroundColor = Colors.LightRed,
-                    content = "회원 탈퇴",
+                    label = "회원 탈퇴",
                     contentColor = Colors.Red,
-                    actionType = ActionType.NONE
-                ) {
-
-                }
+                    actionType = ActionType.NONE,
+                    onClick = {}
+                ) {}
             }
         }
     }
@@ -181,11 +220,14 @@ private fun SettingCard(
     icon: ImageVector,
     iconColor: Color = Colors.Black,
     iconBackgroundColor: Color = Colors.BackgroundColor,
-    content: String,
+    label: String,
     contentColor: Color = Colors.Black,
     actionType: ActionType,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    content: @Composable () -> Unit
 ) {
+    var isChecked by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -207,7 +249,7 @@ private fun SettingCard(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = content,
+                text = label,
                 fontWeight = FontWeight.Medium,
                 fontSize = 18.sp,
                 color = contentColor
@@ -216,15 +258,15 @@ private fun SettingCard(
 
         when (actionType) {
             ActionType.ARROW -> {
-
+                content()
             }
 
             ActionType.SWITCH -> {
-
+                content()
             }
 
             ActionType.NONE -> {
-                Box {}
+                content()
             }
         }
     }

@@ -19,6 +19,9 @@ object Colors {
     val BackgroundColor = Color(0xFFF4F4F4)
 
     val Red = Color(0xFFEE1400)
+    val LightRed = Color(0xFFFFF5F5)
     val Blue = Color(0xFF00A7EE)
+    val Green = Color(0xFF00A30E)
+    val LightGreen = Color(0xFFECFFEE)
     val Transparent = Color.Transparent
 }

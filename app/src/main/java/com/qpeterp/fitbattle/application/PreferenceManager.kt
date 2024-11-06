@@ -8,6 +8,7 @@ class PreferenceManager(context: Context) {
         context.getSharedPreferences(FIT_BATTLE_APP, Context.MODE_PRIVATE)
 
     var token: String by PreferenceDelegate("TOKEN", "")
+    var ttsState: Boolean by PreferenceDelegate("TTS", false)
 
     fun clearToken() {
         token = ""

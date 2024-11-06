@@ -2,7 +2,7 @@ package com.qpeterp.fitbattle.presentation.root.navigation
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,6 +17,8 @@ import com.qpeterp.fitbattle.presentation.features.main.home.screen.HomeScreen
 import com.qpeterp.fitbattle.presentation.features.main.profile.screen.ProfileScreen
 import com.qpeterp.fitbattle.presentation.features.main.rank.screen.RankingScreen
 import com.qpeterp.fitbattle.presentation.features.main.screen.MainScreen
+import com.qpeterp.fitbattle.presentation.features.setting.screen.SettingScreen
+import com.qpeterp.fitbattle.presentation.features.setting.viewModel.SettingViewModel
 
 @ExperimentalMaterial3Api
 @Composable
@@ -25,6 +27,7 @@ fun NavigationGraph(
     isUserLoggedIn: Boolean
 ) {
     val registerViewModel: RegisterViewModel = hiltViewModel()
+    val settingViewModel: SettingViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -70,6 +73,11 @@ fun NavigationGraph(
 
         composable(NavGroup.Main.PROFILE) {
             ProfileScreen(navController)
+        }
+
+        // Feature 그룹 네비게이션
+        composable(NavGroup.Feature.SETTING) {
+            SettingScreen(navController, settingViewModel)
         }
     }
 }
