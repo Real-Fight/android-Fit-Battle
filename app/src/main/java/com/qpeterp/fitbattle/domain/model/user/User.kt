@@ -1,11 +1,19 @@
 package com.qpeterp.fitbattle.domain.model.user
 
+import com.qpeterp.fitbattle.data.data.serializer.UUIDSerializer
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
-
+@Serializable
 data class User(
-    val id: UUID,
-    val loginId: String,
-    val password: String,
+    @Serializable(with = UUIDSerializer::class) val id: UUID,
     val name: String,
+    val profileImgUrl: String,
+    val statusMessage: String,
+    val strength: Int,
+    val endurance: Int,
+    val agility: Int,
+    val willpower: Int,
+    val totalPower: Int,
+    val ranking: Int,
 )

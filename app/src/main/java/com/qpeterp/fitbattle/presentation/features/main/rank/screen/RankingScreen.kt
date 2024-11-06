@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,87 +47,92 @@ fun RankingScreen(
     // 화면이 처음 생성될 때 getRankingList 호출
     LaunchedEffect(Unit) {
         viewModel.getRankingList()
+        viewModel.getMyRankInfo()
     }
 
     val rankingList = viewModel.rankingList
+    val myProfileInfo = viewModel.myRankInfo.collectAsState().value
+    val isLoading = viewModel.isLoading.collectAsState().value
 
     Column(
         modifier = Modifier.padding(horizontal = 20.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(Colors.BackgroundColor, Colors.White), // 그라데이션 색상
-                        start = Offset(0f, 0f), // 상단 시작점
-                        end = Offset(0f, Float.POSITIVE_INFINITY) // 하단 끝점
-                    ),
-                    RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                )
-                .padding(20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        if (!isLoading) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                AsyncImage(
-                    model = ImageRequest
-                        .Builder(LocalContext.current)
-                        .data("https://mikuwallets.kr/assets/img/project/2017_lpip_header.jpg")
-                        .build(),
-                    contentDescription = "My Profile Image",
-                    contentScale = ContentScale.Crop,
-                    imageLoader = ImageLoader(LocalContext.current),
-                    modifier = Modifier
-                        .size(76.dp)
-                        .clip(CircleShape)
-                )
-                Column {
-                    Text(
-                        text = "이성은이라는 뜻",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Colors.Black
-                    )
-                    Text(
-                        text = "1023",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Colors.LightPrimaryColor
-                    )
-                }
-            }
-
-            Text(
-                text = "No.4",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Colors.LightPrimaryColor
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        if (rankingList.isEmpty()) {
-            Text(
-                text = "랭킹에 등록된 유저가 없습니다.",
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp,
-                color = Colors.GrayDark,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 240.dp),
-                textAlign = TextAlign.Center
-            )
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Colors.BackgroundColor, Colors.White), // 그라데이션 색상
+                            start = Offset(0f, 0f), // 상단 시작점
+                            end = Offset(0f, Float.POSITIVE_INFINITY) // 하단 끝점
+                        ),
+                        RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                    )
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(rankingList) { item ->
-                    RankCard(item)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    AsyncImage(
+                        model = ImageRequest
+                            .Builder(LocalContext.current)
+                            .data(myProfileInfo.profileImgUrl)
+                            .build(),
+                        contentDescription = "My Profile Image",
+                        contentScale = ContentScale.Crop,
+                        imageLoader = ImageLoader(LocalContext.current),
+                        modifier = Modifier
+                            .size(76.dp)
+                            .clip(CircleShape)
+                    )
+                    Column {
+                        Text(
+                            text = myProfileInfo.name,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Colors.Black
+                        )
+                        Text(
+                            text = myProfileInfo.totalPower.toString(),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Colors.LightPrimaryColor
+                        )
+                    }
+                }
+
+                Text(
+                    text = "No.${myProfileInfo.ranking}",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Colors.LightPrimaryColor
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            if (rankingList.isEmpty()) {
+                Text(
+                    text = "랭킹에 등록된 유저가 없습니다.",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 16.sp,
+                    color = Colors.GrayDark,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 240.dp),
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(rankingList) { item ->
+                        RankCard(item)
+                    }
                 }
             }
         }
