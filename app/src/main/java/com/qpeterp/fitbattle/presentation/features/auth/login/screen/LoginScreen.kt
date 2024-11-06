@@ -62,116 +62,113 @@ fun LoginScreen(
             lastBackPressTime.longValue = currentTime
         }
     }
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-                .background(Colors.White),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Row(
-                    modifier = Modifier.padding(top = 80.dp)
-                ) {
-                    // TODO: 앱 아이콘 박아놓기
-                    Text(
-                        "운동한판",
-                        color = Colors.Black,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        "에 로그인하기",
-                        color = Colors.Black,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Colors.White)
+            .padding(horizontal = 20.dp, vertical = 32.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.padding(top = 80.dp)
+            ) {
+                // TODO: 앱 아이콘 박아놓기
                 Text(
-                    "로그인할 아이디와 비밀번호를 입력해주세요",
+                    "운동한판",
                     color = Colors.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(top = 10.dp)
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    "에 로그인하기",
+                    color = Colors.Black,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+            Text(
+                "로그인할 아이디와 비밀번호를 입력해주세요",
+                color = Colors.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(top = 10.dp)
+            )
+
+            Spacer(modifier = Modifier.height(64.dp))
+
+            Column {
+                FitBattleTextField(
+                    label = "아이디",
+                    keyboardType = KeyboardType.Text,
+                    onValueChange = { userId = it } // 상태 변경 처리
                 )
 
-                Spacer(modifier = Modifier.height(64.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-                Column {
-                    FitBattleTextField(
-                        label = "아이디",
-                        keyboardType = KeyboardType.Text,
-                        onValueChange = { userId = it } // 상태 변경 처리
+                FitBattleTextField(
+                    label = "비밀번호",
+                    keyboardType = KeyboardType.Password,
+                    onValueChange = { password = it } // 상태 변경 처리
+                )
+
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Colors.Red,
+                        modifier = Modifier.padding(vertical = 16.dp)
                     )
-
-                    Spacer(modifier = Modifier.height(32.dp))
-
-                    FitBattleTextField(
-                        label = "비밀번호",
-                        keyboardType = KeyboardType.Password,
-                        onValueChange = { password = it } // 상태 변경 처리
-                    )
-
-                    if (errorMessage.isNotEmpty()) {
-                        Text(
-                            text = errorMessage,
-                            color = Colors.Red,
-                            modifier = Modifier.padding(vertical = 16.dp)
-                        )
-                    }
                 }
             }
+        }
 
-            Column {
-                FitBattleButton(
-                    text = "로그인",
-                    onClick = {
-                        if (userId.isEmpty() || password.isEmpty()) {
-                            errorMessage = "빈값을 채워주세요."
-                            return@FitBattleButton
-                        }
-                        CoroutineScope(Dispatchers.Main).launch {
-                            viewModel.login(userId, password,
-                                onLoginSuccess = {
-                                    navController.navigate("main") {
-                                        Log.d(Constant.TAG, "로그인 성공")
-                                        popUpTo("login") { inclusive = true }
-                                    }
-                                },
-                                onLoginFailure = { message ->
-                                    errorMessage = message
+        Column {
+            FitBattleButton(
+                text = "로그인",
+                onClick = {
+                    if (userId.isEmpty() || password.isEmpty()) {
+                        errorMessage = "빈값을 채워주세요."
+                        return@FitBattleButton
+                    }
+                    CoroutineScope(Dispatchers.Main).launch {
+                        viewModel.login(userId, password,
+                            onLoginSuccess = {
+                                navController.navigate("main") {
+                                    Log.d(Constant.TAG, "로그인 성공")
+                                    popUpTo("login") { inclusive = true }
                                 }
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                            },
+                            onLoginFailure = { message ->
+                                errorMessage = message
+                            }
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    "계정이 없으신가요? ",
+                    color = Colors.Black,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        "계정이 없으신가요? ",
-                        color = Colors.Black,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        "회원가입",
-                        color = Colors.LightPrimaryColor,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.clickable {
-                            navController.navigate("registerId")
-                        }
-                    )
-                }
+                Text(
+                    "회원가입",
+                    color = Colors.LightPrimaryColor,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.clickable {
+                        navController.navigate("registerId")
+                    }
+                )
             }
         }
     }

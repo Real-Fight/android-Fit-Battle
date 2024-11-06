@@ -41,76 +41,73 @@ fun RegisterIdScreen(
         navController
     )
 
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-                .background(Colors.White),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Row(
-                    modifier = Modifier.padding(top = 80.dp)
-                ) {
-                    Text(
-                        "유저 아이디",
-                        color = Colors.Black,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        "를 입력해주세요.",
-                        color = Colors.Black,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Colors.White)
+            .padding(horizontal = 20.dp, vertical = 32.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.padding(top = 80.dp)
+            ) {
                 Text(
-                    "로그인 시, 사용될 아이디입니다.",
+                    "유저 아이디",
                     color = Colors.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(top = 10.dp)
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
-
-                Spacer(modifier = Modifier.height(64.dp))
-
-                Column {
-                    FitBattleTextField(
-                        label = "아이디",
-                        currentText = userId.value,
-                        keyboardType = KeyboardType.Text,
-                        onValueChange = { userId.value = it } // 상태 변경 처리
-                    )
-
-                    if (errorMessage.value.isNotEmpty()) {
-                        Text(
-                            text = errorMessage.value,
-                            color = Colors.Red,
-                            modifier = Modifier.padding(vertical = 16.dp)
-                        )
-                    }
-                }
+                Text(
+                    "를 입력해주세요.",
+                    color = Colors.Black,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Medium
+                )
             }
+            Text(
+                "로그인 시, 사용될 아이디입니다.",
+                color = Colors.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(top = 10.dp)
+            )
+
+            Spacer(modifier = Modifier.height(64.dp))
 
             Column {
-                FitBattleButton(
-                    text = "다음으로",
-                    onClick = {
-                        if (userId.value.isEmpty()) {
-                            errorMessage.value = "아이디를 입력해주세요."
-                            return@FitBattleButton
-                        }
-                        viewModel.inputId(userId.value)
-
-                        navController.navigate("registerPassword")
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                FitBattleTextField(
+                    label = "아이디",
+                    currentText = userId.value,
+                    keyboardType = KeyboardType.Text,
+                    onValueChange = { userId.value = it } // 상태 변경 처리
                 )
+
+                if (errorMessage.value.isNotEmpty()) {
+                    Text(
+                        text = errorMessage.value,
+                        color = Colors.Red,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
             }
+        }
+
+        Column {
+            FitBattleButton(
+                text = "다음으로",
+                onClick = {
+                    if (userId.value.isEmpty()) {
+                        errorMessage.value = "아이디를 입력해주세요."
+                        return@FitBattleButton
+                    }
+                    viewModel.inputId(userId.value)
+
+                    navController.navigate("registerPassword")
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

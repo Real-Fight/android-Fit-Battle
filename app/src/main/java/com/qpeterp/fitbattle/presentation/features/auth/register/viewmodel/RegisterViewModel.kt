@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.qpeterp.fitbattle.domain.usecase.auth.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,9 +19,6 @@ class RegisterViewModel @Inject constructor(
 
     private val _name = mutableStateOf("")
     val name get() = _name.value
-
-    private val _registerResult = mutableStateOf<Result<Unit>?>(null)
-    val registerResult get() = _registerResult.value
 
     fun inputId(newId: String) {
         _id.value = newId
@@ -38,20 +36,30 @@ class RegisterViewModel @Inject constructor(
         _id.value = ""
         _password.value = ""
         _name.value = ""
-        _registerResult.value = null
     }
 
-    suspend fun register(loginId: String, password: String, name: String) {
-        registerUsCase(
+    suspend fun register(
+        onRegisterSuccess: () -> Unit,
+        onRegisterFailure: (String) -> Unit
+        ) {
+        val result = registerUsCase(
             param = RegisterUseCase.Param(
-                loginId = loginId,
+                loginId = id,
                 password = password,
                 name = name
             )
-        ).onSuccess {
-            _registerResult.value = Result.success(Unit)
+        )
+
+        result.onSuccess {
+            if (it.isSuccessful) {
+                onRegisterSuccess()
+            } else {
+                val errorBody = it.errorBody()?.string() ?: "서버 에러"
+                val message = JSONObject(errorBody).optString("message", errorBody)
+                onRegisterFailure(message)
+            }
         }.onFailure {
-            _registerResult.value = Result.failure(it)
+            onRegisterFailure(it.message.toString())
         }
     }
 }

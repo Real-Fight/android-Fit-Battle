@@ -11,10 +11,11 @@ import com.qpeterp.fitbattle.presentation.features.auth.register.screen.Register
 import com.qpeterp.fitbattle.presentation.features.auth.register.screen.RegisterIdScreen
 import com.qpeterp.fitbattle.presentation.features.auth.register.screen.RegisterNameScreen
 import com.qpeterp.fitbattle.presentation.features.auth.register.screen.RegisterPasswordScreen
+import com.qpeterp.fitbattle.presentation.features.auth.register.viewmodel.RegisterViewModel
 import com.qpeterp.fitbattle.presentation.features.main.battle.screen.BattleScreen
 import com.qpeterp.fitbattle.presentation.features.main.home.screen.HomeScreen
 import com.qpeterp.fitbattle.presentation.features.main.profile.screen.ProfileScreen
-import com.qpeterp.fitbattle.presentation.features.main.ranking.screen.RankingScreen
+import com.qpeterp.fitbattle.presentation.features.main.rank.screen.RankingScreen
 import com.qpeterp.fitbattle.presentation.features.main.screen.MainScreen
 
 @ExperimentalMaterial3Api
@@ -23,6 +24,8 @@ fun NavigationGraph(
     navController: NavHostController,
     isUserLoggedIn: Boolean
 ) {
+    val registerViewModel: RegisterViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         startDestination = if (isUserLoggedIn) NavGroup.Main.MAIN else NavGroup.Auth.LOGIN
@@ -33,15 +36,15 @@ fun NavigationGraph(
         }
 
         composable(NavGroup.Auth.REGISTER_ID) {
-            RegisterIdScreen(navController)
+            RegisterIdScreen(navController, registerViewModel)
         }
 
         composable(NavGroup.Auth.REGISTER_PASSWORD) {
-            RegisterPasswordScreen(navController)
+            RegisterPasswordScreen(navController, registerViewModel)
         }
 
         composable(NavGroup.Auth.REGISTER_NAME) {
-            RegisterNameScreen(navController)
+            RegisterNameScreen(navController, registerViewModel)
         }
 
         composable(NavGroup.Auth.REGISTER_COMPLETE) {

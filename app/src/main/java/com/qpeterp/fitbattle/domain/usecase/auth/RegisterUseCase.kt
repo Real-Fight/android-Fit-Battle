@@ -1,6 +1,6 @@
 package com.qpeterp.fitbattle.domain.usecase.auth
 
-import com.qpeterp.fitbattle.domain.repository.auth.AuthRepository
+import com.qpeterp.fitbattle.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class RegisterUseCase @Inject constructor(

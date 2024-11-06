@@ -31,44 +31,41 @@ fun RegisterCompleteScreen(
     navController: NavController,
 ) {
     BackHandler(enabled = true) {}
-    Scaffold { padding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Colors.White)
+            .padding(horizontal = 20.dp, vertical = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp)
-                .background(Colors.White),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    "좋습니다!",
-                    color = Colors.LightPrimaryColor,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    "이제 운동 한판하러 가볼까요?",
-                    color = Colors.Black,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    modifier = Modifier.padding(top = 10.dp)
-                )
-            }
+            Text(
+                "좋습니다!",
+                color = Colors.LightPrimaryColor,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                "이제 운동 한판하러 가볼까요?",
+                color = Colors.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(top = 10.dp)
+            )
+        }
 
-            Column {
-                FitBattleButton(
-                    text = "로그인",
-                    onClick = {
-                        navController.navigate("login")
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+        Column {
+            FitBattleButton(
+                text = "로그인",
+                onClick = {
+                    navController.navigate("login")
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
