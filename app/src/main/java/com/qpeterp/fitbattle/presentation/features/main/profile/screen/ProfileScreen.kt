@@ -1,14 +1,11 @@
 package com.qpeterp.fitbattle.presentation.features.main.profile.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
@@ -37,165 +33,249 @@ import com.qpeterp.fitbattle.R
 import com.qpeterp.fitbattle.presentation.features.main.profile.viewmodel.ProfileViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.qpeterp.fitbattle.presentation.core.component.FitBattleTextField
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    viewModel: ProfileViewModel = viewModel()
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val dummyList by viewModel.dummyDataList.collectAsState()
-    val scrollState = rememberScrollState()
+    LaunchedEffect(Unit) {
+        viewModel.getMyRankInfo()
+        viewModel.getHistory()
+    }
+    val coroutineScope = rememberCoroutineScope()
+    val isLoading = viewModel.isLoading.collectAsState().value
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp)
-            .scrollable(
-                state = scrollState,
-                orientation = Orientation.Vertical
-            )
-    ) {
-        Box(
+    if (!isLoading) {
+        val historyList = viewModel.historyList.value!!
+        val myProfileInfo = viewModel.myRankInfo!!
+        var editStatusState by remember { mutableStateOf(false) }
+
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Colors.White, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
+                .padding(horizontal = 20.dp),
         ) {
-            Row(
-                modifier = Modifier.padding(20.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AsyncImage(
-                    model = ImageRequest
-                        .Builder(LocalContext.current)
-                        .data("https://img.freepik.com/free-photo/spectrum-flashes-coloured-light_23-2151792416.jpg")
-                        .build(),
-                    contentDescription = "my Profile Image",
-                    contentScale = ContentScale.Crop,
-                    imageLoader = ImageLoader(LocalContext.current),
+            item {
+                Box(
                     modifier = Modifier
-                        .size(86.dp)
-                        .clip(CircleShape)
-                )
+                        .fillMaxWidth()
+                        .background(Colors.White, RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        modifier = Modifier.padding(20.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = ImageRequest
+                                .Builder(LocalContext.current)
+                                .data(myProfileInfo.profileImgUrl)
+                                .build(),
+                            contentDescription = "my Profile Image",
+                            contentScale = ContentScale.Crop,
+                            imageLoader = ImageLoader(LocalContext.current),
+                            modifier = Modifier
+                                .size(86.dp)
+                                .clip(CircleShape)
+                        )
 
-                Spacer(modifier = Modifier.width(20.dp)) // 간격
+                        Spacer(modifier = Modifier.width(20.dp)) // 간격
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                text = myProfileInfo.name,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 16.sp,
+                                color = Colors.Black
+                            )
+                            StatusText(
+                                "순위",
+                                myProfileInfo.ranking.toString()
+                            )
+                            StatusText(
+                                "전투력",
+                                myProfileInfo.totalPower.toString()
+                            )
+                        }
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .fillMaxWidth()
+                        .background(Colors.White, RoundedCornerShape(12.dp))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Absolute.SpaceAround,
+                    ) {
+                        StatusText(
+                            "힘",
+                            myProfileInfo.strength.toString(),
+                        )
+                        StatusText(
+                            "체력",
+                            myProfileInfo.endurance.toString(),
+                        )
+                        StatusText(
+                            "민첩성",
+                            myProfileInfo.agility.toString(),
+                        )
+                        StatusText(
+                            "정신력",
+                            myProfileInfo.willpower.toString(),
+                        )
+                    }
+                }
 
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "상태 메세지",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = Colors.Black
+                        )
+                        IconButton(
+                            onClick = {
+                                editStatusState = true
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = "icon to edit status message",
+                                tint = Colors.GrayDark
+                            )
+                        }
+                    }
+
+                    if (myProfileInfo.statusMessage.isEmpty()) {
+                        Text(
+                            text = "상태메세지를 입력해보세요.",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = Colors.GrayDark,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Colors.White, RoundedCornerShape(12.dp))
+                                .padding(20.dp)
+                        )
+                    } else {
+                        Text(
+                            text = myProfileInfo.statusMessage,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            color = Colors.Black,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Colors.White, RoundedCornerShape(12.dp))
+                                .padding(20.dp)
+                        )
+                    }
+                }
+
+                Text(
+                    text = "성공한 챌린지",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 18.sp,
+                    color = Colors.Black
+                )
+
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .fillMaxWidth()
+                        .background(Colors.White, RoundedCornerShape(12.dp))
                 ) {
                     Text(
-                        text = "이성은이라는 뜻",
+                        text = "성공한 챌린지가 없습니다.",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 18.sp,
+                        color = Colors.Black,
+                        modifier = Modifier.padding(20.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "대전 기록",
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp,
+                        fontSize = 18.sp,
                         color = Colors.Black
                     )
-                    StatusText(
-                        "순위",
-                        "100"
-                    )
-                    StatusText(
-                        "전투력",
-                        "1243"
+                    Text(
+                        text = "운동 ${historyList.size}판",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        color = Colors.GrayDark
                     )
                 }
             }
-        }
 
-        Box(
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-                .fillMaxWidth()
-                .background(Colors.White, RoundedCornerShape(12.dp))
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(12.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Absolute.SpaceAround,
-            ) {
-                StatusText(
-                    "힘",
-                    "123",
-                )
-                StatusText(
-                    "체력",
-                    "123",
-                )
-                StatusText(
-                    "민첩성",
-                    "123",
-                )
-                StatusText(
-                    "정신력",
-                    "123",
-                )
-            }
-        }
-
-        Text(
-            text = "성공한 챌린지",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 20.sp,
-            color = Colors.Black
-        )
-
-        Box(
-            modifier = Modifier
-                .padding(vertical = 10.dp)
-                .fillMaxWidth()
-                .background(Colors.White, RoundedCornerShape(12.dp))
-        ) {
-            Text(
-                text = "성공한 챌린지가 없습니다.",
-                fontWeight = FontWeight.Medium,
-                fontSize = 20.sp,
-                color = Colors.Black,
-                modifier = Modifier.padding(20.dp)
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "대전 기록",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                color = Colors.Black
-            )
-            Text(
-                text = "운동 ${dummyList.size}판",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
-                color = Colors.GrayDark
-            )
-        }
-
-        LazyColumn(
-            modifier = Modifier.padding(top = 10.dp)
-        ) {
-            items(dummyList) { item ->
+            items(historyList) { item ->
                 Box(
                     modifier = Modifier
-                        .padding(bottom = 10.dp)
+                        .padding(vertical = 10.dp)
                         .fillMaxWidth()
                         .background(Colors.White, RoundedCornerShape(12.dp))
                 ) {
                     BattleHistoryCard(
-                        result = item.result,
-                        mode = item.mode,
-                        count = item.count,
+                        result = if (item.result == "WIN") true else false,
+                        mode = item.matchType,
+                        count = item.score.toString(),
                     )
                 }
             }
         }
 
+        if (editStatusState) {
+            EditStatusDialog(
+                myProfileInfo.statusMessage,
+                onCancel = {
+                    editStatusState = false
+                },
+                onConfirm = {
+                    coroutineScope.launch {
+                        viewModel.patchStatusMessage(it)
+                        editStatusState = false // 다이얼로그 닫기
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -279,4 +359,51 @@ private fun BattleHistoryCard(
             )
         }
     }
+}
+
+@Composable
+private fun EditStatusDialog(
+    statusMessage: String,
+    onCancel: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    val text = remember { mutableStateOf(statusMessage) }
+    AlertDialog(
+        containerColor = Colors.White,
+        onDismissRequest = { onCancel() },
+        title = {
+            Text(
+                text = "상태 메세지",
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                color = Colors.LightPrimaryColor
+            )
+        },
+        text = {
+            FitBattleTextField(
+                label = "상태 메세지",
+                currentText = text.value,
+                keyboardType = KeyboardType.Text
+            ) {
+                text.value = it
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm(text.value)
+                }
+            ) {
+                Text(
+                    text = "확인",
+                    color = Colors.LightPrimaryColor
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancel) {
+                Text(text = "취소", color = Colors.Black)
+            }
+        }
+    )
 }

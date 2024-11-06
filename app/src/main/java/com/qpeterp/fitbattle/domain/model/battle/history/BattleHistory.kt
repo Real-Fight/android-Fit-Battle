@@ -1,7 +1,10 @@
 package com.qpeterp.fitbattle.domain.model.battle.history
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class BattleHistory(
-    val result: Boolean,
-    val mode: String,
-    val count: String
+    val matchType: String,
+    val result: String,
+    val score: Int
 )
