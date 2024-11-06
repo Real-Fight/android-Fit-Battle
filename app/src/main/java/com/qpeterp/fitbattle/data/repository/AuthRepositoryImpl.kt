@@ -1,7 +1,7 @@
 package com.qpeterp.fitbattle.data.repository
 
-import com.qpeterp.fitbattle.data.data.LoginData
-import com.qpeterp.fitbattle.data.data.RegisterData
+import com.qpeterp.fitbattle.data.data.auth.LoginData
+import com.qpeterp.fitbattle.data.data.auth.RegisterData
 import com.qpeterp.fitbattle.data.remote.service.AuthService
 import com.qpeterp.fitbattle.domain.repository.AuthRepository
 import retrofit2.Response
