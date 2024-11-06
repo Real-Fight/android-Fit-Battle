@@ -17,6 +17,7 @@ import com.qpeterp.fitbattle.presentation.features.main.home.screen.HomeScreen
 import com.qpeterp.fitbattle.presentation.features.main.profile.screen.ProfileScreen
 import com.qpeterp.fitbattle.presentation.features.main.rank.screen.RankingScreen
 import com.qpeterp.fitbattle.presentation.features.main.screen.MainScreen
+import com.qpeterp.fitbattle.presentation.features.main.viewmodel.MainViewModel
 import com.qpeterp.fitbattle.presentation.features.setting.screen.SettingScreen
 import com.qpeterp.fitbattle.presentation.features.setting.viewModel.SettingViewModel
 
@@ -28,6 +29,7 @@ fun NavigationGraph(
 ) {
     val registerViewModel: RegisterViewModel = hiltViewModel()
     val settingViewModel: SettingViewModel = hiltViewModel()
+    val mainViewModel: MainViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -56,7 +58,7 @@ fun NavigationGraph(
 
         // Main 그룹 네비게이션
         composable(NavGroup.Main.MAIN) {
-            MainScreen(navController)
+            MainScreen(navController, mainViewModel)
         }
 
         composable(NavGroup.Main.HOME) {

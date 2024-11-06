@@ -133,6 +133,5 @@ fun HandleBack(
         },
         title = "회원가입 중단",
         message = "정말 로그인 페이지로 돌아가시겠습니까?\n작성 중인 정보가 사라집니다.",
-        isPositive = false
     )
 }

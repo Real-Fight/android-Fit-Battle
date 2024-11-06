@@ -2,7 +2,6 @@ package com.qpeterp.fitbattle.presentation.features.setting.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,13 +36,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.qpeterp.fitbattle.application.MyApplication
+import com.qpeterp.fitbattle.presentation.core.component.FitBattleDialog
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import com.qpeterp.fitbattle.presentation.features.setting.viewModel.SettingViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
-
-enum class ActionType {
-    ARROW, SWITCH, NONE
-}
 
 @Composable
 fun SettingScreen(
@@ -51,6 +47,7 @@ fun SettingScreen(
     viewModel: SettingViewModel = hiltViewModel()
 ) {
     var ttsState by remember { mutableStateOf(viewModel.ttsState) }
+    var resignDialogState by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -88,7 +85,6 @@ fun SettingScreen(
                 SettingCard(
                     icon = Icons.Outlined.Visibility,
                     label = "개인 정보 정책",
-                    actionType = ActionType.ARROW,
                     onClick = {
                     }
                 ) {
@@ -107,7 +103,6 @@ fun SettingScreen(
                 SettingCard(
                     icon = Icons.Outlined.Info,
                     label = "앱 정보",
-                    actionType = ActionType.ARROW,
                     onClick = {}
                 ) {
                     Icon(
@@ -142,7 +137,6 @@ fun SettingScreen(
                     iconColor = Colors.Green,
                     iconBackgroundColor = Colors.LightGreen,
                     label = "음성 옵션(TTS)",
-                    actionType = ActionType.SWITCH,
                     onClick = {}
                 ) {
                     Switch(
@@ -187,7 +181,6 @@ fun SettingScreen(
                     iconColor = Colors.Red,
                     iconBackgroundColor = Colors.LightRed,
                     label = "로그아웃",
-                    actionType = ActionType.NONE,
                     onClick = {
                         MyApplication.prefs.clearToken()
                         navController.navigate("login") {
@@ -207,11 +200,29 @@ fun SettingScreen(
                     iconBackgroundColor = Colors.LightRed,
                     label = "회원 탈퇴",
                     contentColor = Colors.Red,
-                    actionType = ActionType.NONE,
-                    onClick = {}
+                    onClick = {
+                        resignDialogState = true
+                    }
                 ) {}
             }
         }
+
+        FitBattleDialog(
+            showDialog = resignDialogState,
+            title = "회원 탈퇴",
+            titleColor = Colors.Red,
+            message = "정말 회원을 탈퇴하시겠습니까?\n모든 정보가 사라집니다.",
+            confirmColor = Colors.Red,
+            onConfirm = {
+                resignDialogState = false
+                navController.navigate("login") {
+                    popUpTo(0)
+                }
+            },
+            onDismiss = {
+                resignDialogState = false
+            }
+        )
     }
 }
 
@@ -222,12 +233,9 @@ private fun SettingCard(
     iconBackgroundColor: Color = Colors.BackgroundColor,
     label: String,
     contentColor: Color = Colors.Black,
-    actionType: ActionType,
     onClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    var isChecked by remember { mutableStateOf(false) }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -256,18 +264,6 @@ private fun SettingCard(
             )
         }
 
-        when (actionType) {
-            ActionType.ARROW -> {
-                content()
-            }
-
-            ActionType.SWITCH -> {
-                content()
-            }
-
-            ActionType.NONE -> {
-                content()
-            }
-        }
+        content()
     }
 }
