@@ -6,6 +6,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
@@ -17,8 +18,9 @@ fun FitBattleDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     title: String,
+    titleColor: Color = Colors.Black,
     message: String,
-    isPositive: Boolean = true
+    confirmColor: Color = Colors.LightPrimaryColor,
 ) {
     if (showDialog) {
         AlertDialog(
@@ -26,12 +28,17 @@ fun FitBattleDialog(
             containerColor = Colors.White,
             titleContentColor = Colors.LightPrimaryColor,
             shape = RoundedCornerShape(12.dp),
-            title = { Text(text = title) },
+            title = {
+                Text(
+                    text = title,
+                    color = titleColor
+                )
+            },
             text = { Text(text = message) },
             confirmButton = {
                 Text(
                     text = "확인",
-                    color = if (isPositive) Colors.LightPrimaryColor else Colors.Black,
+                    color = confirmColor,
                     fontSize = 14.sp,
                     modifier = Modifier
                         .fitBattleClickable {
@@ -43,7 +50,7 @@ fun FitBattleDialog(
             dismissButton = {
                 Text(
                     text = "취소",
-                    color = if (isPositive) Colors.Black else Colors.LightPrimaryColor,
+                    color = Colors.Black,
                     fontSize = 14.sp,
                     modifier = Modifier
                         .fitBattleClickable {
