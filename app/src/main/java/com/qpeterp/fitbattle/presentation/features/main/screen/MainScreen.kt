@@ -3,6 +3,7 @@ package com.qpeterp.fitbattle.presentation.features.main.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +30,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -87,18 +89,25 @@ fun MainScreen(
 fun MyTopAppBar(selectedItem: Int, onIconClick: () -> Unit) {
     TopAppBar(
         title = {
-            Text(
-                text = when (selectedItem) {
-                    0 -> "홈"
-                    1 -> "운동한판"
-                    2 -> "운동랭킹"
-                    3 -> "프로필"
-                    else -> ""
-                },
-                color = Color.Black,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            Box( // 시작 정렬을 위해 Box 사용
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                contentAlignment = Alignment.CenterStart // 시작 정렬
+            ) {
+                Text(
+                    text = when (selectedItem) {
+                        0 -> "홈"
+                        1 -> "운동한판"
+                        2 -> "운동랭킹"
+                        3 -> "프로필"
+                        else -> ""
+                    },
+                    color = Color.Black,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -108,13 +117,21 @@ fun MyTopAppBar(selectedItem: Int, onIconClick: () -> Unit) {
         ),
         actions = {
             if (selectedItem == 3) {
-                IconButton(onClick = { onIconClick() }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Settings, // 아이콘 리소스 ID
-                        contentDescription = "설정 아이콘", // 접근성 텍스트
-                        tint = Color.DarkGray, // 아이콘 색상
-                        modifier = Modifier.size(32.dp)
-                    )
+                Box( // 시작 정렬을 위해 Box 사용
+                    modifier = Modifier
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.CenterStart // 시작 정렬
+                ){
+                    IconButton(onClick = { onIconClick() }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = "설정 아이콘",
+                            tint = Color.DarkGray,
+                            modifier = Modifier
+                                .size(32.dp)
+                                .fillMaxHeight()
+                        )
+                    }
                 }
             }
         }

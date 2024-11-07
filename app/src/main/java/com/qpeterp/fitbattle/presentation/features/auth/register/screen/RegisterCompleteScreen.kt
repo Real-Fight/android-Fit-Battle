@@ -35,7 +35,7 @@ fun RegisterCompleteScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Colors.White)
-            .padding(horizontal = 20.dp, vertical = 32.dp),
+            .padding(horizontal = 20.dp, vertical = 64.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
