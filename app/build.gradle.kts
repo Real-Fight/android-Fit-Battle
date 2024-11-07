@@ -65,7 +65,8 @@ android {
 dependencies {
     // hilt
     implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose) // 최신 버전 사용
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.runtime.livedata) // 최신 버전 사용
     ksp(libs.hilt.compiler)
     ksp(libs.dagger.compiler) // Dagger compiler
 
