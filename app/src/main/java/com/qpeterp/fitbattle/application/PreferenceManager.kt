@@ -2,6 +2,7 @@ package com.qpeterp.fitbattle.application
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.qpeterp.fitbattle.domain.model.train.TrainType
 
 class PreferenceManager(context: Context) {
     private val prefs: SharedPreferences =
@@ -9,6 +10,7 @@ class PreferenceManager(context: Context) {
 
     var token: String by PreferenceDelegate("TOKEN", "")
     var ttsState: Boolean by PreferenceDelegate("TTS", false)
+    var trainType: String by PreferenceDelegate("TRAIN", TrainType.PUSH_UP.label)
 
     fun clearToken() {
         token = ""

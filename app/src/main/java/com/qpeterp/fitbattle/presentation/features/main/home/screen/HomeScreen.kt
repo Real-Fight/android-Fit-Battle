@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.qpeterp.fitbattle.R
+import com.qpeterp.fitbattle.application.MyApplication
+import com.qpeterp.fitbattle.domain.model.train.TrainType
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import com.qpeterp.fitbattle.presentation.features.main.home.viewmodel.HomeViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
@@ -169,6 +171,7 @@ fun HomeScreen(
                 icon = painterResource(R.drawable.ic_training_strength),
                 title = "푸쉬업 훈련"
             ) {
+                MyApplication.prefs.trainType = TrainType.PUSH_UP.label
                 navController.navigate("train")
             }
 
@@ -176,7 +179,8 @@ fun HomeScreen(
                 icon = painterResource(R.drawable.ic_training_strength),
                 title = "스쿼트 훈련"
             ) {
-
+                MyApplication.prefs.trainType = TrainType.SQUAT.label
+                navController.navigate("train")
             }
 
             Text(

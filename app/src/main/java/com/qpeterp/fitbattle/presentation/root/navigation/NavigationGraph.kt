@@ -20,6 +20,7 @@ import com.qpeterp.fitbattle.presentation.features.main.screen.MainScreen
 import com.qpeterp.fitbattle.presentation.features.main.viewmodel.MainViewModel
 import com.qpeterp.fitbattle.presentation.features.setting.screen.SettingScreen
 import com.qpeterp.fitbattle.presentation.features.setting.viewModel.SettingViewModel
+import com.qpeterp.fitbattle.presentation.features.train.screen.TrainScreen
 
 @ExperimentalMaterial3Api
 @Composable
@@ -80,6 +81,9 @@ fun NavigationGraph(
         // Feature 그룹 네비게이션
         composable(NavGroup.Feature.SETTING) {
             SettingScreen(navController, settingViewModel)
+        }
+        composable(NavGroup.Feature.TRAIN) {
+            TrainScreen(navController)
         }
     }
 }
