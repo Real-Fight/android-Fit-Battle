@@ -47,6 +47,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.qpeterp.fitbattle.domain.model.battle.type.MatchType
 import com.qpeterp.fitbattle.presentation.core.component.FitBattleTextField
 import kotlinx.coroutines.launch
 
@@ -306,7 +307,7 @@ private fun StatusText(
 @Composable
 private fun BattleHistoryCard(
     result: Boolean,
-    mode: String,
+    mode: MatchType,
     count: String
 ) {
     Row(
@@ -334,7 +335,7 @@ private fun BattleHistoryCard(
                     color = if (result) Colors.Blue else Colors.Red
                 )
                 Text(
-                    text = mode,
+                    text = mode.length,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                     color = Colors.GrayDark
@@ -346,7 +347,7 @@ private fun BattleHistoryCard(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = "스쿼트",
+                text = mode.name,
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
                 color = Colors.Black
