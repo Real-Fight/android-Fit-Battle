@@ -100,13 +100,13 @@ class ExerciseClassification(
         val isBasicPose = poseMatcher.match(pose, basicPose)
         when {
             isMovePose -> {
-                if (trainViewModel.squatState.value == PoseType.DOWN) {
+                if (trainViewModel.fitState.value == PoseType.DOWN) {
                     trainViewModel.setFitState(PoseType.UP)
                 }
             }
 
             isBasicPose -> {
-                if (trainViewModel.squatState.value == PoseType.UP) {
+                if (trainViewModel.fitState.value == PoseType.UP) {
                     trainViewModel.addCount()
                     trainViewModel.setFitState(PoseType.DOWN)
                 }
