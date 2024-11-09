@@ -70,7 +70,7 @@ fun TrainScreen(
     val context = LocalContext.current
 
     val tts = rememberTextToSpeech()
-    val squatState = viewModel.squatState.observeAsState()
+    val squatState = viewModel.fitState.observeAsState()
 
     LifecycleStartEffect(Unit) {
         // lifecycle start 시 할것,

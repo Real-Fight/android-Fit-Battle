@@ -12,14 +12,14 @@ import javax.inject.Inject
 class TrainViewModel @Inject constructor(
 ): ViewModel() {
     private val _count = MutableLiveData<Int>(0)
-    private val _squatState = MutableLiveData<PoseType>(PoseType.DOWN)
+    private val _fitState = MutableLiveData<PoseType>(PoseType.DOWN)
     private val _trainType = MutableLiveData<TrainType>(TrainType.SQUAT)
 
     val count: LiveData<Int>
         get() = _count
 
-    val squatState: LiveData<PoseType>
-        get() = _squatState
+    val fitState: LiveData<PoseType>
+        get() = _fitState
 
     val trainType: LiveData<TrainType>
         get() = _trainType
@@ -29,7 +29,7 @@ class TrainViewModel @Inject constructor(
     }
 
     fun setFitState(poseType: PoseType) {
-        _squatState.value = poseType
+        _fitState.value = poseType
     }
 
     fun setTrainType(trainType: TrainType) {
