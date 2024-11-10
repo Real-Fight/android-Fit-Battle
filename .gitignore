@@ -9,3 +9,4 @@
 .cxx
 local.properties
 /app/src/main/java/com/qpeterp/fitbattle/data/remote/
+/app/src/main/res/xml/network_security_config.xml
