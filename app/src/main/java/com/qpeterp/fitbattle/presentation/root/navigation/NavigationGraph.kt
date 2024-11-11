@@ -12,6 +12,8 @@ import com.qpeterp.fitbattle.presentation.features.auth.register.screen.Register
 import com.qpeterp.fitbattle.presentation.features.auth.register.screen.RegisterNameScreen
 import com.qpeterp.fitbattle.presentation.features.auth.register.screen.RegisterPasswordScreen
 import com.qpeterp.fitbattle.presentation.features.auth.register.viewmodel.RegisterViewModel
+import com.qpeterp.fitbattle.presentation.features.battle.screen.LoadingScreen
+import com.qpeterp.fitbattle.presentation.features.battle.screen.MuscleBattleScreen
 import com.qpeterp.fitbattle.presentation.features.main.battle.screen.BattleScreen
 import com.qpeterp.fitbattle.presentation.features.main.home.screen.HomeScreen
 import com.qpeterp.fitbattle.presentation.features.main.profile.screen.ProfileScreen
@@ -82,8 +84,17 @@ fun NavigationGraph(
         composable(NavGroup.Feature.SETTING) {
             SettingScreen(navController, settingViewModel)
         }
+
         composable(NavGroup.Feature.TRAIN) {
             TrainScreen(navController)
+        }
+
+        composable(NavGroup.Feature.LOADING) {
+            LoadingScreen(navController)
+        }
+
+        composable(NavGroup.Feature.MUSCLE_BATTLE) {
+            MuscleBattleScreen(navController)
         }
     }
 }

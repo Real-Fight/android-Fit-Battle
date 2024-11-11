@@ -50,7 +50,7 @@ import androidx.navigation.NavController
 import com.qpeterp.fitbattle.application.MyApplication
 import com.qpeterp.fitbattle.common.Constant
 import com.qpeterp.fitbattle.domain.model.train.TrainType
-import com.qpeterp.fitbattle.domain.usecase.pose.ImageAnalyzer
+import com.qpeterp.fitbattle.domain.usecase.pose.train.ImageAnalyzer
 import com.qpeterp.fitbattle.domain.usecase.pose.PhoneOrientationDetector
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import com.qpeterp.fitbattle.presentation.features.train.viewmodel.TrainViewModel

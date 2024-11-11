@@ -1,5 +1,6 @@
 package com.qpeterp.fitbattle.presentation.features.main.profile.viewmodel
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.qpeterp.fitbattle.common.Constant
@@ -12,7 +13,7 @@ import com.qpeterp.fitbattle.domain.usecase.user.UserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,6 +54,23 @@ class ProfileViewModel @Inject constructor(
         }.onFailure {
             Log.d(Constant.TAG, "patchStatusMessage error : $it")
         }
+    }
+
+    suspend fun patchProfile(profile: Bitmap) {
+        userProfileUseCase(
+            UserProfileUseCase.Param(
+                image = bitmapToByteArray(profile)
+            )
+        ).onSuccess {
+        }.onFailure {
+            Log.d(Constant.TAG, "patchProfile error : $it")
+        }
+    }
+
+    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream) // JPEG 형식으로 압축
+        return stream.toByteArray()
     }
 
     suspend fun getHistory() {

@@ -1,4 +1,4 @@
-package com.qpeterp.fitbattle.domain.usecase.pose
+package com.qpeterp.fitbattle.domain.usecase.pose.train
 
 import android.content.Context
 import androidx.annotation.OptIn

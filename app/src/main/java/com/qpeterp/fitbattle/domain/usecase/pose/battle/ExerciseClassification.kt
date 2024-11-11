@@ -1,4 +1,4 @@
-package com.qpeterp.fitbattle.domain.usecase.pose
+package com.qpeterp.fitbattle.domain.usecase.pose.battle
 
 import android.content.Context
 import android.util.Log
@@ -9,24 +9,27 @@ import com.qpeterp.fitbattle.domain.model.pose.PoseType
 import com.qpeterp.fitbattle.domain.model.pose.TargetPose
 import com.qpeterp.fitbattle.domain.model.pose.TargetShape
 import com.qpeterp.fitbattle.domain.model.train.TrainType
-import com.qpeterp.fitbattle.presentation.features.train.viewmodel.TrainViewModel
+import com.qpeterp.fitbattle.domain.usecase.pose.PhoneOrientationDetector
+import com.qpeterp.fitbattle.domain.usecase.pose.PoseMatcher
+import com.qpeterp.fitbattle.presentation.features.battle.common.BattleConstants
+import com.qpeterp.fitbattle.presentation.features.battle.viewmodel.MuscleBattleViewModel
 
 class ExerciseClassification(
-    private val trainViewModel: TrainViewModel,
+    private val muscleViewModel: MuscleBattleViewModel,
     context: Context
 ) {
     private val phoneOrientationDetector = PhoneOrientationDetector(context = context)
     private val targetSquatMovePose: TargetPose = TargetPose(
         listOf(
-            TargetShape(
-                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 95.0
-            ),
+//            TargetShape(
+//                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 95.0
+//            ),
             TargetShape(
                 PoseLandmark.RIGHT_ANKLE, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, 95.0
             ),
-            TargetShape(
-                PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_SHOULDER, 95.0
-            ),
+//            TargetShape(
+//                PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_SHOULDER, 95.0
+//            ),
             TargetShape(
                 PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_SHOULDER, 95.0
             ),
@@ -34,15 +37,15 @@ class ExerciseClassification(
     )
     private val targetSquatBasicPose: TargetPose = TargetPose(
         listOf(
-            TargetShape(
-                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 180.0
-            ),
+//            TargetShape(
+//                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 180.0
+//            ),
             TargetShape(
                 PoseLandmark.RIGHT_ANKLE, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, 180.0
             ),
-            TargetShape(
-                PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_SHOULDER, 180.0
-            ),
+//            TargetShape(
+//                PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_SHOULDER, 180.0
+//            ),
             TargetShape(
                 PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_SHOULDER, 180.0
             ),
@@ -54,13 +57,10 @@ class ExerciseClassification(
                 PoseLandmark.RIGHT_WRIST,
                 PoseLandmark.RIGHT_ELBOW,
                 PoseLandmark.RIGHT_SHOULDER,
-                160.0
+                170.0
             ),
             TargetShape(
                 PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 170.0
-            ),
-            TargetShape(
-                PoseLandmark.RIGHT_ELBOW, PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, 90.0
             ),
         )
     )
@@ -100,22 +100,22 @@ class ExerciseClassification(
         val isBasicPose = poseMatcher.match(pose, basicPose)
         when {
             isMovePose -> {
-                if (trainViewModel.fitState.value == PoseType.DOWN) {
-                    trainViewModel.setFitState(PoseType.UP)
+                if (muscleViewModel.fitState.value == PoseType.DOWN) {
+                    muscleViewModel.setFitState(PoseType.UP)
                 }
             }
 
             isBasicPose -> {
-                if (trainViewModel.fitState.value == PoseType.UP) {
-                    trainViewModel.addCount()
-                    trainViewModel.setFitState(PoseType.DOWN)
+                if (muscleViewModel.fitState.value == PoseType.UP) {
+                    muscleViewModel.addMyCount()
+                    muscleViewModel.setFitState(PoseType.DOWN)
                 }
             }
         }
     }
 
     fun classifyExercise(pose: Pose) {
-        val trainType = trainViewModel.trainType.value
+        val trainType = BattleConstants.FIT_TYPE
         when (trainType) {
             TrainType.SQUAT -> {
                 if (pose.getPoseLandmark(25) == null || pose.getPoseLandmark(26) == null) return

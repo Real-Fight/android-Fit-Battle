@@ -1,5 +1,10 @@
 package com.qpeterp.fitbattle.presentation.features.main.profile.screen
 
+import android.annotation.SuppressLint
+import android.net.Uri
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,6 +40,7 @@ import com.qpeterp.fitbattle.presentation.features.main.profile.viewmodel.Profil
 import com.qpeterp.fitbattle.presentation.theme.Colors
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -47,10 +54,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.Bitmap
+import com.qpeterp.fitbattle.domain.model.battle.result.GameResult
 import com.qpeterp.fitbattle.domain.model.battle.type.MatchType
 import com.qpeterp.fitbattle.presentation.core.component.FitBattleTextField
+import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import kotlinx.coroutines.launch
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun ProfileScreen(
     navController: NavController,
@@ -67,6 +78,19 @@ fun ProfileScreen(
         val historyList = viewModel.historyList.value!!
         val myProfileInfo = viewModel.myRankInfo!!
         var editStatusState by remember { mutableStateOf(false) }
+        var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+        val context = LocalContext.current
+
+        // 이미지 선택을 위한 ActivityResultLauncher
+        val imageLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            uri?.let {
+                val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                selectedBitmap = bitmap // 선택된 이미지를 상태에 저장
+            }
+        }
 
         LazyColumn(
             modifier = Modifier
@@ -84,18 +108,31 @@ fun ProfileScreen(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        AsyncImage(
-                            model = ImageRequest
-                                .Builder(LocalContext.current)
-                                .data(myProfileInfo.profileImgUrl)
-                                .build(),
-                            contentDescription = "my Profile Image",
-                            contentScale = ContentScale.Crop,
-                            imageLoader = ImageLoader(LocalContext.current),
-                            modifier = Modifier
-                                .size(86.dp)
-                                .clip(CircleShape)
-                        )
+                        Box(
+                            contentAlignment = Alignment.BottomEnd
+                        ) {
+                            AsyncImage(
+                                model = ImageRequest
+                                    .Builder(LocalContext.current)
+                                    .data(myProfileInfo.profileImgUrl)
+                                    .build(),
+                                contentDescription = "my Profile Image",
+                                contentScale = ContentScale.Crop,
+                                imageLoader = ImageLoader(LocalContext.current),
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .size(86.dp)
+                                    .clip(CircleShape)
+                            )
+                            Icon(
+                                imageVector = Icons.Outlined.CameraAlt,
+                                contentDescription = "icon to change profile Image",
+                                tint = Colors.Black,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .fitBattleClickable { imageLauncher.launch("image/*") }
+                            )
+                        }
 
                         Spacer(modifier = Modifier.width(20.dp)) // 간격
 
@@ -206,6 +243,8 @@ fun ProfileScreen(
                     }
                 }
 
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = "성공한 챌린지",
                     fontWeight = FontWeight.SemiBold,
@@ -255,11 +294,19 @@ fun ProfileScreen(
                         .background(Colors.White, RoundedCornerShape(12.dp))
                 ) {
                     BattleHistoryCard(
-                        result = if (item.result == "WIN") true else false,
+                        result = item.result,
                         mode = item.matchType,
                         count = item.score.toString(),
                     )
                 }
+            }
+        }
+
+        selectedBitmap?.let { bitmap ->
+            LaunchedEffect(key1 = bitmap) {
+                // patchProfile 호출 후 selectedBitmap 초기화를 마지막에 수행
+                viewModel.patchProfile(bitmap)
+                selectedBitmap = null
             }
         }
 
@@ -306,7 +353,7 @@ private fun StatusText(
 
 @Composable
 private fun BattleHistoryCard(
-    result: Boolean,
+    result: GameResult,
     mode: MatchType,
     count: String
 ) {
@@ -329,10 +376,10 @@ private fun BattleHistoryCard(
             )
             Column {
                 Text(
-                    text = if (result) "승리" else "패배",
+                    text = result.message,
                     fontWeight = FontWeight.Medium,
                     fontSize = 20.sp,
-                    color = if (result) Colors.Blue else Colors.Red
+                    color = result.resultColor
                 )
                 Text(
                     text = mode.length,
@@ -347,7 +394,7 @@ private fun BattleHistoryCard(
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = mode.name,
+                text = mode.type,
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
                 color = Colors.Black

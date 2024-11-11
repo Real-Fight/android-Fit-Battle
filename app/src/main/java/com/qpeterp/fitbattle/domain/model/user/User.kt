@@ -1,6 +1,6 @@
 package com.qpeterp.fitbattle.domain.model.user
 
-import com.qpeterp.fitbattle.data.data.serializer.UUIDSerializer
+import com.qpeterp.fitbattle.data.utils.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
 

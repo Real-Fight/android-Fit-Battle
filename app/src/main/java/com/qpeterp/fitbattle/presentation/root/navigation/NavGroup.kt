@@ -20,5 +20,7 @@ sealed class NavGroup(val group: String) {
     data object Feature: NavGroup("feature") {
         const val TRAIN = "train"
         const val SETTING = "setting"
+        const val LOADING = "loading"
+        const val MUSCLE_BATTLE = "muscleBattle"
     }
 }

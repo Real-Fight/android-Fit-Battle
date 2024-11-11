@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.qpeterp.fitbattle.data.socket.data.MatchType
+import com.qpeterp.fitbattle.domain.model.train.TrainType
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import com.qpeterp.fitbattle.presentation.features.main.battle.viewmodel.BattleViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
@@ -44,6 +46,7 @@ fun BattleScreen(
     val scrollState = rememberScrollState()
     var showDialog by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(-1) }
+    var fitMode by remember { mutableStateOf(TrainType.SQUAT) }
     Column(
         modifier = Modifier
             .padding(20.dp)
@@ -60,6 +63,7 @@ fun BattleScreen(
             content = "더 많은 푸쉬업으로 상대를 넘어보세요!",
             animation = "",
         ) {
+            fitMode = TrainType.PUSH_UP
             showDialog = true
         }
         BattleCard(
@@ -67,6 +71,7 @@ fun BattleScreen(
             content = "다리 근력을 강화하고 경쟁에서 앞서가세요!",
             animation = "",
         ) {
+            fitMode = TrainType.SQUAT
             showDialog = true
         }
 
@@ -80,22 +85,28 @@ fun BattleScreen(
             content = "지금 바로 달려서 경쟁에서 승리하세요!",
             animation = "",
         ) {
+            fitMode = TrainType.RUN
             showDialog = true
         }
     }
 
     if (showDialog) {
         ChoiceBattleModeDialog(
+            fitMode = fitMode,
             selectedOption = selectedOption,
             onOptionSelected = { selectedOption = it },
             onCancel = {
                 showDialog = false
                 selectedOption = -1
             },
-            onConfirm = {
+            onConfirm = { matchType, fitType ->
                 // 확인 시 동작
+                viewModel.setMatchType(matchType, fitType)
                 showDialog = false
                 selectedOption = -1
+                navController.navigate("loading") {
+                    popUpTo(0)
+                }
             }
         )
     }
@@ -151,10 +162,11 @@ private fun BattleCard(
 
 @Composable
 fun ChoiceBattleModeDialog(
+    fitMode: TrainType,
     selectedOption: Int,
     onOptionSelected: (Int) -> Unit,
     onCancel: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: (MatchType, TrainType) -> Unit
 ) {
     val options = listOf("단기전" to "30초", "중기전" to "5분", "장기전" to "30분")
 
@@ -209,7 +221,28 @@ fun ChoiceBattleModeDialog(
             TextButton(
                 onClick = {
                     if (selectedOption == -1) return@TextButton
-                    onConfirm()
+                    val matchType: MatchType = when(fitMode) {
+                        TrainType.PUSH_UP -> {
+                            when(selectedOption) {
+                                0 -> MatchType.SHORTPUSHUP
+                                1 -> MatchType.MIDDLEPUSHUP
+                                2 -> MatchType.LONGPUSHUP
+                                else -> MatchType.SHORTPUSHUP
+                            }
+                        }
+                        TrainType.SQUAT -> {
+                            when(selectedOption) {
+                                0 -> MatchType.SHORTSQUAT
+                                1 -> MatchType.MIDDLESQUAT
+                                2 -> MatchType.LONGSQUAT
+                                else -> MatchType.SHORTSQUAT
+                            }
+                        }
+                        TrainType.RUN -> {
+                            MatchType.SHORTSQUAT
+                        }
+                    }
+                    onConfirm(matchType, fitMode)
                 }
             ) {
                 Text(
