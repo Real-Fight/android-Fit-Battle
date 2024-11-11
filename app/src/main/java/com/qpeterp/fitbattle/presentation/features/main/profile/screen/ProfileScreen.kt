@@ -284,12 +284,13 @@ fun ProfileScreen(
                         color = Colors.GrayDark
                     )
                 }
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
             items(historyList) { item ->
                 Box(
                     modifier = Modifier
-                        .padding(vertical = 10.dp)
+                        .padding(bottom = 10.dp)
                         .fillMaxWidth()
                         .background(Colors.White, RoundedCornerShape(12.dp))
                 ) {
