@@ -31,6 +31,7 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "BASE_URL", "${properties["BASE_URL"]}")
+            buildConfigField("String", "SOCKET_URL", "${properties["SOCKET_URL"]}")
         }
 
         release {
@@ -63,6 +64,9 @@ android {
 }
 
 dependencies {
+    // 우리의 희망 jackson
+    implementation(libs.jackson.module.kotlin)
+
     // hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
