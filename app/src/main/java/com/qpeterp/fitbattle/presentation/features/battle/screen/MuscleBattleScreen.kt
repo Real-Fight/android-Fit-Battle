@@ -2,6 +2,7 @@ package com.qpeterp.fitbattle.presentation.features.battle.screen
 
 import android.app.Activity
 import android.content.Context
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -159,7 +160,7 @@ fun MuscleBattleScreen(
                 modifier = Modifier
                     .size(54.dp)
                     .padding(top = 4.dp, end = 20.dp)
-                    .fitBattleClickable {},
+                    .fitBattleClickable { giveUpDialogState = true },
             )
         }
 
@@ -223,10 +224,8 @@ fun MuscleBattleScreen(
         confirmColor = Colors.LightPrimaryColor,
         onDismiss = { giveUpDialogState = false },
         onConfirm = {
+            giveUpDialogState = false
             viewModel.giveUp()
-            navController.navigate("main") {
-                popUpTo(0)
-            }
         },
     )
 
