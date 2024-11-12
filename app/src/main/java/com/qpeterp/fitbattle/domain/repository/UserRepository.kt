@@ -15,4 +15,6 @@ interface UserRepository {
     )
 
     suspend fun getHistory(): List<BattleHistory>
+
+    suspend fun getQuest(): Quest
 }

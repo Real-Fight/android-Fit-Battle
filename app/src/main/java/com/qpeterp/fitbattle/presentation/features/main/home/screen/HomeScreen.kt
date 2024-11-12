@@ -24,6 +24,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,156 +54,167 @@ import com.qpeterp.fitbattle.presentation.theme.Colors
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val screenScrollState = rememberScrollState()
     val challengeScrollState = rememberScrollState()
-    Column(
-        modifier = Modifier
-            .verticalScroll(
-                state = screenScrollState,
-            ),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .background(Colors.White, RoundedCornerShape(12.dp))
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 18.dp)
-                    .padding(top = 16.dp),
-            ) {
-                Text(
-                    text = "오늘의 퀘스트",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Colors.Black
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_run),
-                            contentDescription = "Today mission fit type image",
-                            modifier = Modifier.size(52.dp),
-                            tint = Colors.LightPrimaryColor
-                        )
-                        Text(
-                            text = "달리기 한판 승부",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Colors.Black
-                        )
-                    }
+    val isLoading = viewModel.isLoading.collectAsState().value
 
-                    TodayMissionButton {
-                        // TODO: 운동 dialog 띄우기
+    LaunchedEffect(Unit) {
+        viewModel.getQuest()
+    }
+
+    if (!isLoading) {
+        val quest = viewModel.quest.value!!
+        Column(
+            modifier = Modifier
+                .verticalScroll(
+                    state = screenScrollState,
+                ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .background(Colors.White, RoundedCornerShape(12.dp))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 18.dp)
+                        .padding(top = 16.dp),
+                ) {
+                    Text(
+                        text = "오늘의 퀘스트",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Colors.Black
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_run),
+                                contentDescription = "Today mission fit type image",
+                                modifier = Modifier.size(52.dp),
+                                tint = Colors.LightPrimaryColor
+                            )
+                            Text(
+                                text = quest.message,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Colors.Black
+                            )
+                        }
+
+                        TodayMissionButton(
+                            isCompleted = quest.completed
+                        ) {
+                            // TODO: 운동 dialog 띄우기
+                        }
                     }
                 }
             }
-        }
 
-        Text(
-            text = "챌린지",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Colors.Black,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-        )
+            Text(
+                text = "챌린지",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Colors.Black,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .horizontalScroll(
-                    state = challengeScrollState,
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .horizontalScroll(
+                        state = challengeScrollState,
+                    )
+                    .padding(horizontal = 20.dp)
+            ) {
+                ChallengeCard(
+                    mainColor = Colors.LightPrimaryColor,
+                    subColor = Colors.LightPrimaryColorDark,
+                    title = "전신 7X4\n챌린지",
+                    content = "온 몸의 근육들을 파괴해보세요!",
+                    animation = "", // TODO: 애니메이션 추가 얘정
+                ) {
+
+                }
+                ChallengeCard(
+                    mainColor = Colors.DarkPrimaryColor,
+                    subColor = Colors.DarkPrimaryColorDark,
+                    title = "문가인 챌린지",
+                    content = "문가인을 뛰어넘어 보세요!",
+                    animation = "" // TODO: 애니메이션 추가 얘정
+                ) {
+
+                }
+            }
+
+            Text(
+                text = "훈련",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Colors.Black,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            )
+
+            Column {
+                Text(
+                    text = "근력",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Colors.Black,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 16.dp)
                 )
-                .padding(horizontal = 20.dp)
-        ) {
-            ChallengeCard(
-                mainColor = Colors.LightPrimaryColor,
-                subColor = Colors.LightPrimaryColorDark,
-                title = "전신 7X4\n챌린지",
-                content = "온 몸의 근육들을 파괴해보세요!",
-                animation = "", // TODO: 애니메이션 추가 얘정
-            ) {
 
-            }
-            ChallengeCard(
-                mainColor = Colors.DarkPrimaryColor,
-                subColor = Colors.DarkPrimaryColorDark,
-                title = "문가인 챌린지",
-                content = "문가인을 뛰어넘어 보세요!",
-                animation = "" // TODO: 애니메이션 추가 얘정
-            ) {
+                TrainingCard(
+                    icon = painterResource(R.drawable.ic_training_strength),
+                    title = "푸쉬업 훈련"
+                ) {
+                    MyApplication.prefs.trainType = TrainType.PUSH_UP.label
+                    navController.navigate("train")
+                }
 
-            }
-        }
+                TrainingCard(
+                    icon = painterResource(R.drawable.ic_training_strength),
+                    title = "스쿼트 훈련"
+                ) {
+                    MyApplication.prefs.trainType = TrainType.SQUAT.label
+                    navController.navigate("train")
+                }
 
-        Text(
-            text = "훈련",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Colors.Black,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-        )
+                Text(
+                    text = "체력",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Colors.Black,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 16.dp)
+                )
 
-        Column {
-            Text(
-                text = "근력",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Colors.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 16.dp)
-            )
+                TrainingCard(
+                    icon = painterResource(R.drawable.ic_training_stamina),
+                    title = "달리기 훈련"
+                ) {
 
-            TrainingCard(
-                icon = painterResource(R.drawable.ic_training_strength),
-                title = "푸쉬업 훈련"
-            ) {
-                MyApplication.prefs.trainType = TrainType.PUSH_UP.label
-                navController.navigate("train")
-            }
-
-            TrainingCard(
-                icon = painterResource(R.drawable.ic_training_strength),
-                title = "스쿼트 훈련"
-            ) {
-                MyApplication.prefs.trainType = TrainType.SQUAT.label
-                navController.navigate("train")
-            }
-
-            Text(
-                text = "체력",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Colors.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 16.dp)
-            )
-
-            TrainingCard(
-                icon = painterResource(R.drawable.ic_training_stamina),
-                title = "달리기 훈련"
-            ) {
-
+                }
             }
         }
     }
@@ -206,7 +222,8 @@ fun HomeScreen(
 
 @Composable
 private fun TodayMissionButton(
-    onClick: () -> Unit
+    isCompleted: Boolean,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -237,7 +254,7 @@ private fun ChallengeCard(
     textColor: Color = Colors.White,
     buttonColor: Color = Colors.White,
     animation: String, // 추후, 업데이트 예정
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -260,7 +277,7 @@ private fun ChallengeCard(
             modifier = Modifier.align(Alignment.TopStart)
         )
 
-        Column (
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
@@ -299,7 +316,7 @@ private fun ChallengeCard(
 private fun TrainingCard(
     icon: Painter,
     title: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier

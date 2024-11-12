@@ -47,4 +47,15 @@ class UserRepositoryImpl @Inject constructor(
             throw Exception("Failed to fetch user data")
         }
     }
+
+    override suspend fun getQuest(): Quest {
+        val response = userService.getQuest(authorization = MyApplication.prefs.token)
+
+        if (response.isSuccessful) {
+            Log.d(Constant.TAG, "get history : ${response.body()}")
+            return response.body()!!.data
+        } else {
+            throw Exception("Failed to fetch user data")
+        }
+    }
 }
