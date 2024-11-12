@@ -64,8 +64,11 @@ android {
 }
 
 dependencies {
-    // 우리의 희망 jackson
-    implementation(libs.jackson.module.kotlin)
+    // Rive
+    // During initialization, you may need to add a dependency
+    // for Jetpack Startup
+    implementation(libs.rive.android)
+    implementation(libs.androidx.startup.runtime)
 
     // hilt
     implementation(libs.hilt.android)
@@ -78,6 +81,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
     implementation(libs.kotlinx.serialization.json)
+    implementation (libs.converter.scalars)
 
     // pose detection
     implementation(libs.pose.detection)
