@@ -16,6 +16,7 @@ fun rememberTextToSpeech(): MutableState<TextToSpeech?> {
     val tts = remember { mutableStateOf<TextToSpeech?>(null) }
     DisposableEffect(context) {
         val speech = textToSpeech.textToSpeech(context, tts.value)
+        speech.setSpeechRate(3.0f) // 말하기 속도 2배로 설정
         tts.value = speech
 
         onDispose {
