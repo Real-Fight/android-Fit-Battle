@@ -89,6 +89,16 @@ fun MuscleBattleScreen(
     Log.d(Constant.TAG, "rival info: $rivalInfo user info: $userInfo")
 
     val myCount = viewModel.myCount.collectAsState()
+
+    val tts = rememberTextToSpeech()
+
+    tts.value?.speak(
+        myCount.value.toString(),
+        TextToSpeech.QUEUE_FLUSH,
+        null,
+        ""
+    )
+
     val rivalCount = viewModel.rivalCount.collectAsState()
 
     LifecycleStartEffect(Unit) {
