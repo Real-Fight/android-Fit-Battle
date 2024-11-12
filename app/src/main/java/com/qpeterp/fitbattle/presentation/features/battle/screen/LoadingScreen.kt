@@ -1,5 +1,6 @@
 package com.qpeterp.fitbattle.presentation.features.battle.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,22 +17,44 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import app.rive.runtime.kotlin.core.Alignment as RiveAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import app.rive.runtime.kotlin.core.ExperimentalAssetLoader
+import com.qpeterp.fitbattle.R
+import com.qpeterp.fitbattle.domain.model.train.TrainType
+import com.qpeterp.fitbattle.presentation.core.component.FitBattleDialog
+import com.qpeterp.fitbattle.presentation.core.component.RiveAnimation
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
+import com.qpeterp.fitbattle.presentation.features.battle.common.BattleConstants
 import com.qpeterp.fitbattle.presentation.features.battle.viewmodel.LoadingViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
 
+@OptIn(ExperimentalAssetLoader::class)
 @Composable
 fun LoadingScreen(
     navController: NavController,
     viewModel: LoadingViewModel = hiltViewModel(),
 ) {
     val matchingState by viewModel.matchingState.collectAsState()
+    var matchingCancelState by remember { mutableStateOf(false) }
+    val animation = when (BattleConstants.FIT_TYPE) {
+        TrainType.SQUAT -> R.raw.squat
+        TrainType.PUSH_UP -> R.raw.push_up
+        TrainType.RUN -> R.raw.squat
+    }
+
+    BackHandler(enabled = true) {
+        matchingCancelState = true
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -52,12 +75,7 @@ fun LoadingScreen(
                     modifier = Modifier
                         .padding(horizontal = 20.dp, vertical = 16.dp)
                         .size(36.dp)
-                        .fitBattleClickable {
-                            viewModel.matchingCancel()
-                            navController.navigate("main") {
-                                popUpTo(0)
-                            }
-                        }
+                        .fitBattleClickable { matchingCancelState = true }
                 )
             }
         }
@@ -66,13 +84,18 @@ fun LoadingScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "애니메이션",
-                color = Colors.Black,
-                fontSize = 40.sp
+            RiveAnimation(
+                modifier = Modifier
+                    .padding(end = 40.dp)
+                    .size(200.dp),
+                resId = animation,
+                alignment = RiveAlignment.BOTTOM_RIGHT,
+                autoplay = true,
+                animationName = "Timeline 1",
+                contentDescription = "Just a Rive Animation",
             )
             Text(
-                text = if (matchingState) "운동한판!" else "매칭 중...",
+                text = if (matchingState) "운동한판!" else "상대 찾는 중...",
                 color = if (matchingState) Colors.LightPrimaryColor else Colors.Black,
                 fontSize = 28.sp
             )
@@ -92,4 +115,20 @@ fun LoadingScreen(
         navController.navigate("muscleBattle")
         viewModel.setMatchingState()
     }
+
+    FitBattleDialog(
+        showDialog = matchingCancelState,
+        title = "매칭 취소",
+        titleColor = Colors.Black,
+        message = "매칭을 취소하시겠습니까?",
+        confirmColor = Colors.LightPrimaryColor,
+        onDismiss = { matchingCancelState = false },
+        onConfirm = {
+            matchingCancelState = false
+            viewModel.matchingCancel()
+            navController.navigate("main") {
+                popUpTo(0)
+            }
+        },
+    )
 }

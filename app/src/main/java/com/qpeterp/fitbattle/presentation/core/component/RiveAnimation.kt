@@ -34,7 +34,7 @@ fun RiveAnimation(
     artboardName: String? = null,
     animationName: String? = null,
     stateMachineName: String? = null,
-    fit: Fit = Fit.NONE,
+    fit: Fit = Fit.FIT_HEIGHT,
     alignment: Alignment = Alignment.TOP_RIGHT,
     loop: Loop = Loop.AUTO,
     contentDescription: String?,
