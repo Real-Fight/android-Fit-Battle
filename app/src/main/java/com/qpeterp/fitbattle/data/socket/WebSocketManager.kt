@@ -132,7 +132,7 @@ class WebSocketManager @Inject constructor() {
 
     fun sendGiveUp() {
         val request = RequestWrapper(
-            event = Event.SCOREUPDATE.toString(),
+            event = Event.GIVEUP.toString(),
             data = RequestMessage.EmptyData
         )
 

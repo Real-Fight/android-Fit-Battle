@@ -48,6 +48,7 @@ class RequestMessageSerializer :
             "SCOREUPDATE" -> RequestMessage.ScoreUpdateData.serializer()
             "RANDOMMATCH" -> RequestMessage.RandomMatchData.serializer()
             "READIED" -> RequestMessage.ReadiedData.serializer()
+            "GIVEUP" -> RequestMessage.EmptyData.serializer()
             else -> throw SerializationException("Unknown event: ${element.jsonObject["event"]}")
         }
     }

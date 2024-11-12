@@ -18,7 +18,7 @@ import java.util.UUID
 sealed class ResponseMessage
 
 @Serializable
-data object MatchOkData : ResponseMessage()
+data object EmptyData : ResponseMessage()
 
 @Serializable
 data class MatchedData(
@@ -77,7 +77,7 @@ object ResponseMessageSerializer : JsonContentPolymorphicSerializer<ResponseMess
             ?: throw SerializationException("Missing 'event' field in JSON: $json")
 
         return when (event) {
-            "MATCHOK" -> MatchOkData.serializer()
+            "MATCHOK" -> EmptyData.serializer()
             "MATCHED" -> MatchedData.serializer()  // MatchedData 선택
             "STARTGAME" -> StartGameData.serializer()
             "SCOREUPDATE" -> {
@@ -86,6 +86,7 @@ object ResponseMessageSerializer : JsonContentPolymorphicSerializer<ResponseMess
                 ScoreUpdateData.serializer()
             }
             "ENDGAME" -> EndGameData.serializer()
+            "MATCHINGCANCELED" -> EmptyData.serializer()
             else -> throw SerializationException("Unknown event: $event")
         }
     }
