@@ -25,6 +25,7 @@ class RankingViewModel @Inject constructor(
             "...",
             "",
             0,
+            "",
             totalPower = 0
         )
     )
@@ -72,6 +73,7 @@ class RankingViewModel @Inject constructor(
                     ranking = it.ranking,
                     profileImgUrl = it.profileImgUrl,
                     totalPower = it.totalPower,
+                    statusMessage = it.statusMessage
                 )
                 _isLoading.value = false
             }

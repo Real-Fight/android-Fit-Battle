@@ -1,6 +1,7 @@
 package com.qpeterp.fitbattle.presentation.features.main.rank.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -147,7 +149,7 @@ fun RankCard(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Colors.White, RoundedCornerShape(12.dp))
-            .padding(horizontal = 20.dp, vertical = 8.dp),
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -179,12 +181,27 @@ fun RankCard(
                     .size(36.dp)
                     .clip(CircleShape)
             )
-            Text(
-                text = item.name,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                color = Colors.Black
-            )
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = item.name,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Colors.Black
+                )
+                Text(
+                    text = item.statusMessage.ifEmpty { "..." },
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Colors.GrayDark,
+                    modifier = Modifier
+                        .width(170.dp)
+                        .basicMarquee()
+                )
+            }
+
         }
 
         Text(

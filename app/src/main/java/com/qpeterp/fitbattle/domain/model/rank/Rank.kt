@@ -11,5 +11,6 @@ data class Rank(
     val name: String,
     val profileImgUrl: String,
     val ranking: Int,
+    val statusMessage: String,
     val totalPower: Int
 )
