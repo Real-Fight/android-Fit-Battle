@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.qpeterp.fitbattle.common.Constant
 import com.qpeterp.fitbattle.data.socket.WebSocketManager
-import com.qpeterp.fitbattle.data.socket.data.MatchOkData
+import com.qpeterp.fitbattle.data.socket.data.EmptyData
 import com.qpeterp.fitbattle.data.socket.data.MatchedData
 import com.qpeterp.fitbattle.domain.model.battle.user.User
 import com.qpeterp.fitbattle.presentation.features.battle.common.BattleConstants
@@ -26,7 +26,7 @@ class LoadingViewModel @Inject constructor(
 
         webSocketManager.setOnMessageReceived { message ->
             when (message) {
-                is MatchOkData -> {
+                is EmptyData -> {
                     Log.d(Constant.TAG, "webSocketManager matchOk")
                 }
 
