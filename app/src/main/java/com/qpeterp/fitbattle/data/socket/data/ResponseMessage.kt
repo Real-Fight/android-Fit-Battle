@@ -50,8 +50,14 @@ data class ScoreUpdateData(
 data class EndGameData(
     val winner: Map<String, Int>,
     val loser: Map<String, Int>,
-    val draw: Boolean
+    val draw: Boolean,
+    val gainedStats: Map<GainedStatus, Int>,
 ) : ResponseMessage()
+
+enum class GainedStatus(val label: String) {
+    gainedStrength("근력"), gainedEndurance("체력"),
+    gainedAgility("민첩성"), gainedPower("총합 능력치"),
+}
 
 enum class Status {
     READY, PROGRESS
@@ -67,10 +73,11 @@ data class RoomData(
     var status: Status,
     @Contextual val endTimestamp: Timestamp,
     val scores: MutableMap<@Contextual UUID, Int>,
-    val users: MutableMap<@Contextual UUID, UserStatus>
+    val users: MutableMap<@Contextual UUID, UserStatus>,
 )
 
-object ResponseMessageSerializer : JsonContentPolymorphicSerializer<ResponseMessage>(ResponseMessage::class) {
+object ResponseMessageSerializer :
+    JsonContentPolymorphicSerializer<ResponseMessage>(ResponseMessage::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out ResponseMessage> {
         val json = element.jsonObject
         val event = json["event"]?.jsonPrimitive?.content
@@ -81,10 +88,12 @@ object ResponseMessageSerializer : JsonContentPolymorphicSerializer<ResponseMess
             "MATCHED" -> MatchedData.serializer()  // MatchedData 선택
             "STARTGAME" -> StartGameData.serializer()
             "SCOREUPDATE" -> {
-                val data = json["data"] ?: throw SerializationException("Missing 'data' field in JSON: $json")
+                val data = json["data"]
+                    ?: throw SerializationException("Missing 'data' field in JSON: $json")
                 Log.d(Constant.TAG, "scoreUpdate is ${data.jsonObject}")
                 ScoreUpdateData.serializer()
             }
+
             "ENDGAME" -> EndGameData.serializer()
             "MATCHINGCANCELED" -> EmptyData.serializer()
             else -> throw SerializationException("Unknown event: $event")
@@ -93,7 +102,8 @@ object ResponseMessageSerializer : JsonContentPolymorphicSerializer<ResponseMess
 
     fun parseMessage(jsonElement: JsonElement): ResponseMessage {
         val json = jsonElement.jsonObject
-        val data = json["data"] ?: throw SerializationException("Missing 'data' field in JSON: $json")
+        val data =
+            json["data"] ?: throw SerializationException("Missing 'data' field in JSON: $json")
 
         val deserializer = selectDeserializer(jsonElement)
 

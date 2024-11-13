@@ -6,9 +6,10 @@ import kotlinx.serialization.Serializable
 data class Quest(
     val message: String,
     val completed: Boolean,
-    val questType: QuestType
+    val questType: QuestType,
 )
 
 enum class QuestType {
-    PUSHUP, SQUAT, MATCH, SITUP
+    PUSHUP, SQUAT, MATCH, SITUP, WIN, SQUATPERONEGAME,
+    PUSHUPPERONEGAME, SITUPPERONEGAME,
 }

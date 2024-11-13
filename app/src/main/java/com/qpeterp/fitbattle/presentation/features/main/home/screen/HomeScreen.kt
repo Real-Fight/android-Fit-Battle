@@ -70,6 +70,10 @@ fun HomeScreen(
             QuestType.SQUAT -> painterResource(R.drawable.ic_muclse)
             QuestType.PUSHUP -> painterResource(R.drawable.ic_muclse)
             QuestType.SITUP -> painterResource(R.drawable.ic_muclse)
+            QuestType.WIN -> painterResource(R.drawable.ic_strength)
+            QuestType.SITUPPERONEGAME -> painterResource(R.drawable.ic_muclse)
+            QuestType.SQUATPERONEGAME -> painterResource(R.drawable.ic_muclse)
+            QuestType.PUSHUPPERONEGAME -> painterResource(R.drawable.ic_muclse)
         }
         Column(
             modifier = Modifier
