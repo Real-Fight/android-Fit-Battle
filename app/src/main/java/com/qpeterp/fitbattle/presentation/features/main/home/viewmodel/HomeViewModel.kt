@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.qpeterp.fitbattle.common.Constant
 import com.qpeterp.fitbattle.domain.model.user.Quest
+import com.qpeterp.fitbattle.domain.model.user.QuestType
 import com.qpeterp.fitbattle.domain.usecase.user.QuestUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +31,8 @@ class HomeViewModel @Inject constructor(
             .onFailure {
                 _quest.value = Quest(
                     message = "운동한판 2회 (0/2)",
-                    completed = false
+                    completed = false,
+                    questType = QuestType.MATCH
                 )
                 Log.d(Constant.TAG, "getQuest error : $it")
                 _isLoading.value = false
