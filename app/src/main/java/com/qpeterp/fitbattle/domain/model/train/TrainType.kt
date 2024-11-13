@@ -12,6 +12,10 @@ enum class TrainType(
         "푸쉬업",
         false
     ),
+    SIT_UP(
+        "윗몸 일으키기",
+        false
+    ),
     RUN(
         "달리기",
         true

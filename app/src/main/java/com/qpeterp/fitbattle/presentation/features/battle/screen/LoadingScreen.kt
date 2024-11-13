@@ -48,6 +48,7 @@ fun LoadingScreen(
     val animation = when (BattleConstants.FIT_TYPE) {
         TrainType.SQUAT -> R.raw.squat
         TrainType.PUSH_UP -> R.raw.push_up
+        TrainType.SIT_UP -> R.raw.squat
         TrainType.RUN -> R.raw.squat
     }
 

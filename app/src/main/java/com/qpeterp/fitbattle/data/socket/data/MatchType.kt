@@ -10,4 +10,7 @@ enum class MatchType {
     SHORTPUSHUP,
     MIDDLEPUSHUP,
     LONGPUSHUP,
+    SHORTSITUP,
+    MIDDLESITUP,
+    LONGSITUP,
 }

@@ -21,32 +21,32 @@ class ExerciseClassification(
     private val targetSquatMovePose: TargetPose = TargetPose(
         listOf(
             TargetShape(
-                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 95.0
+                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 100.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_ANKLE, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, 95.0
+                PoseLandmark.RIGHT_ANKLE, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, 100.0
             ),
             TargetShape(
-                PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_SHOULDER, 95.0
+                PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_SHOULDER, 100.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_SHOULDER, 95.0
+                PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_SHOULDER, 100.0
             ),
         )
     )
     private val targetSquatBasicPose: TargetPose = TargetPose(
         listOf(
             TargetShape(
-                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 180.0
+                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 170.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_ANKLE, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, 180.0
+                PoseLandmark.RIGHT_ANKLE, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, 170.0
             ),
             TargetShape(
                 PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_SHOULDER, 180.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_SHOULDER, 180.0
+                PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_SHOULDER, 170.0
             ),
         )
     )
@@ -79,6 +79,32 @@ class ExerciseClassification(
             ),
         )
     )
+    private val targetSitUpBasicPose: TargetPose = TargetPose(
+        listOf(
+            TargetShape(
+                PoseLandmark.RIGHT_KNEE,
+                PoseLandmark.RIGHT_HIP,
+                PoseLandmark.RIGHT_SHOULDER,
+                140.0
+            ),
+            TargetShape(
+                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 140.0
+            ),
+        )
+    )
+    private val targetSitUpMovePose: TargetPose = TargetPose(
+        listOf(
+            TargetShape(
+                PoseLandmark.RIGHT_KNEE,
+                PoseLandmark.RIGHT_HIP,
+                PoseLandmark.RIGHT_SHOULDER,
+                10.0
+            ),
+            TargetShape(
+                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 10.0
+            ),
+        )
+    )
     private val poseMatcher = PoseMatcher()
     private lateinit var movePose: TargetPose
     private lateinit var basicPose: TargetPose
@@ -92,6 +118,11 @@ class ExerciseClassification(
             TrainType.PUSH_UP -> {
                 movePose = targetPushUpMovePose
                 basicPose = targetPushUpBasicPose
+            }
+
+            TrainType.SIT_UP -> {
+                movePose = targetSitUpMovePose
+                basicPose = targetSitUpBasicPose
             }
 
             TrainType.RUN -> {
@@ -128,6 +159,12 @@ class ExerciseClassification(
             TrainType.PUSH_UP -> {
                 if (pose.getPoseLandmark(14) == null || pose.getPoseLandmark(30) == null) return
                 if (pose.getPoseLandmark(14)!!.inFrameLikelihood < 0.92 || pose.getPoseLandmark(30)!!.inFrameLikelihood < 0.92) return
+                if (phoneOrientationDetector.verticalHilt) return // check phone inclination vertical
+            }
+
+            TrainType.SIT_UP -> {
+                if (pose.getPoseLandmark(24) == null || pose.getPoseLandmark(12) == null) return
+                if (pose.getPoseLandmark(24)!!.inFrameLikelihood < 0.92 || pose.getPoseLandmark(12)!!.inFrameLikelihood < 0.92) return
                 if (phoneOrientationDetector.verticalHilt) return // check phone inclination vertical
             }
 

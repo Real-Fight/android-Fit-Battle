@@ -26,9 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +44,7 @@ import androidx.navigation.NavController
 import com.qpeterp.fitbattle.R
 import com.qpeterp.fitbattle.application.MyApplication
 import com.qpeterp.fitbattle.domain.model.train.TrainType
+import com.qpeterp.fitbattle.domain.model.user.QuestType
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import com.qpeterp.fitbattle.presentation.features.main.home.viewmodel.HomeViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
@@ -66,6 +64,13 @@ fun HomeScreen(
 
     if (!isLoading) {
         val quest = viewModel.quest.value!!
+
+        val questTypeIcon = when(quest.questType) {
+            QuestType.MATCH -> painterResource(R.drawable.ic_strength)
+            QuestType.SQUAT -> painterResource(R.drawable.ic_muclse)
+            QuestType.PUSHUP -> painterResource(R.drawable.ic_muclse)
+            QuestType.SITUP -> painterResource(R.drawable.ic_muclse)
+        }
         Column(
             modifier = Modifier
                 .verticalScroll(
@@ -100,7 +105,7 @@ fun HomeScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                painter = painterResource(R.drawable.ic_run),
+                                painter = questTypeIcon,
                                 contentDescription = "Today mission fit type image",
                                 modifier = Modifier.size(52.dp),
                                 tint = Colors.LightPrimaryColor
@@ -183,7 +188,7 @@ fun HomeScreen(
                 )
 
                 TrainingCard(
-                    icon = painterResource(R.drawable.ic_training_strength),
+                    icon = painterResource(R.drawable.ic_muclse),
                     title = "푸쉬업 훈련"
                 ) {
                     MyApplication.prefs.trainType = TrainType.PUSH_UP.label
@@ -191,30 +196,38 @@ fun HomeScreen(
                 }
 
                 TrainingCard(
-                    icon = painterResource(R.drawable.ic_training_strength),
+                    icon = painterResource(R.drawable.ic_muclse),
                     title = "스쿼트 훈련"
                 ) {
                     MyApplication.prefs.trainType = TrainType.SQUAT.label
                     navController.navigate("train")
                 }
 
-                Text(
-                    text = "체력",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Colors.Black,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(bottom = 16.dp)
-                )
-
                 TrainingCard(
-                    icon = painterResource(R.drawable.ic_training_stamina),
-                    title = "달리기 훈련"
+                    icon = painterResource(R.drawable.ic_muclse),
+                    title = "윗몸 일으키기 훈련"
                 ) {
-
+                    MyApplication.prefs.trainType = TrainType.SIT_UP.label
+                    navController.navigate("train")
                 }
+
+//                Text(
+//                    text = "체력",
+//                    fontSize = 14.sp,
+//                    fontWeight = FontWeight.Medium,
+//                    color = Colors.Black,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 24.dp)
+//                        .padding(bottom = 16.dp)
+//                )
+//
+//                TrainingCard(
+//                    icon = painterResource(R.drawable.ic_stamina),
+//                    title = "달리기 훈련"
+//                ) {
+//
+//                }
             }
         }
     }
@@ -229,19 +242,21 @@ private fun TodayMissionButton(
         modifier = Modifier
             .size(72.dp)
             .paint(
-                painter = painterResource(R.drawable.bac_mission_button),
+                painter = if (isCompleted) painterResource(R.drawable.bac_mission_complete) else painterResource(R.drawable.bac_mission_button),
                 contentScale = ContentScale.Fit,
             )
             .clickable { onClick() }
     ) {
-        Icon(
-            imageVector = Icons.Default.ArrowForward,
-            contentDescription = "button to battle page",
-            tint = Colors.White,
-            modifier = Modifier
-                .size(28.dp)
-                .align(Alignment.Center)
-        )
+        if (!isCompleted) {
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "button to battle page",
+                tint = Colors.White,
+                modifier = Modifier
+                    .size(28.dp)
+                    .align(Alignment.Center)
+            )
+        }
     }
 }
 

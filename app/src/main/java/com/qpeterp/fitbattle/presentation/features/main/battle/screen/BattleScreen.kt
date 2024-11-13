@@ -79,20 +79,28 @@ fun BattleScreen(
             fitMode = TrainType.SQUAT
             showDialog = true
         }
-
-        Text(
-            text = "유산소한판",
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 20.sp,
-        )
         BattleCard(
-            title = "달리기",
-            content = "지금 바로 달려서 경쟁에서 승리하세요!",
-            battleType = TrainType.RUN,
+            title = "윗몸 일으키기",
+            content = "복근을 강철로 코팅하세요!",
+            battleType = TrainType.SIT_UP,
         ) {
-            fitMode = TrainType.RUN
+            fitMode = TrainType.SIT_UP
             showDialog = true
         }
+
+//        Text(
+//            text = "유산소한판",
+//            fontWeight = FontWeight.SemiBold,
+//            fontSize = 20.sp,
+//        )
+//        BattleCard(
+//            title = "달리기",
+//            content = "지금 바로 달려서 경쟁에서 승리하세요!",
+//            battleType = TrainType.RUN,
+//        ) {
+//            fitMode = TrainType.RUN
+//            showDialog = true
+//        }
     }
 
     if (showDialog) {
@@ -159,6 +167,10 @@ private fun BattleCard(
 
             TrainType.PUSH_UP -> {
                 R.raw.push_up
+            }
+
+            TrainType.SIT_UP -> {
+                R.raw.squat
             }
 
             TrainType.RUN -> {
@@ -301,6 +313,15 @@ fun ChoiceBattleModeDialog(
                                 1 -> MatchType.MIDDLESQUAT
                                 2 -> MatchType.LONGSQUAT
                                 else -> MatchType.SHORTSQUAT
+                            }
+                        }
+
+                        TrainType.SIT_UP -> {
+                            when (selectedOption) {
+                                0 -> MatchType.SHORTSITUP
+                                1 -> MatchType.MIDDLESITUP
+                                2 -> MatchType.LONGSITUP
+                                else -> MatchType.SHORTSITUP
                             }
                         }
 
