@@ -8,6 +8,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -32,7 +33,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -40,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,12 +58,15 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.qpeterp.fitbattle.application.MyApplication
 import com.qpeterp.fitbattle.common.Constant
+import com.qpeterp.fitbattle.domain.model.train.TrainHistory
 import com.qpeterp.fitbattle.domain.model.train.TrainType
 import com.qpeterp.fitbattle.domain.usecase.pose.train.ImageAnalyzer
 import com.qpeterp.fitbattle.domain.usecase.pose.PhoneOrientationDetector
+import com.qpeterp.fitbattle.presentation.core.component.FitBattleDialog
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import com.qpeterp.fitbattle.presentation.features.train.viewmodel.TrainViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
+import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -63,14 +75,17 @@ private lateinit var phoneOrientationDetector: PhoneOrientationDetector
 @Composable
 fun TrainScreen(
     navController: NavController,
-    viewModel: TrainViewModel = hiltViewModel()
+    viewModel: TrainViewModel = hiltViewModel(),
 ) {
     val trainType = MyApplication.prefs.trainType
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
+    var exitState by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     val tts = rememberTextToSpeech()
     val squatState = viewModel.fitState.observeAsState()
+    val angle = viewModel.angle.observeAsState()
 
     LifecycleStartEffect(Unit) {
         // lifecycle start 시 할것,
@@ -89,9 +104,16 @@ fun TrainScreen(
         }
     }
 
-    when (trainType) {
-        "스쿼트" -> viewModel.setTrainType(TrainType.SQUAT)
-        "푸쉬업" -> viewModel.setTrainType(TrainType.PUSH_UP)
+    BackHandler(enabled = true) {
+        exitState = true
+    }
+
+    LaunchedEffect(Unit) {
+        when (trainType) {
+            "스쿼트" -> viewModel.setTrainType(TrainType.SQUAT)
+            "푸쉬업" -> viewModel.setTrainType(TrainType.PUSHUP)
+            "윗몸 일으키기" -> viewModel.setTrainType(TrainType.SITUP)
+        }
     }
 
 //    isSpeaking.value = if (tts.value?.isSpeaking == true) {
@@ -133,9 +155,7 @@ fun TrainScreen(
                     contentDescription = "icon to ArrowBack",
                     tint = Colors.Black,
                     modifier = Modifier.fitBattleClickable {
-                        navController.navigate("main") {
-                            popUpTo(0)
-                        }
+                        exitState = true
                     }
                 )
                 Text(
@@ -146,33 +166,78 @@ fun TrainScreen(
                 )
             }
 
-            AndroidView(
-                factory = { context ->
-                    val preview = PreviewView(context).apply {
-                        layoutParams?.width = ViewGroup.LayoutParams.MATCH_PARENT
-                        layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
-                    }
-                    val cameraExecutor = Executors.newSingleThreadExecutor()
+            Box {
+                AndroidView(
+                    factory = { context ->
+                        val preview = PreviewView(context).apply {
+                            layoutParams?.width = ViewGroup.LayoutParams.MATCH_PARENT
+                            layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
+                        }
+                        val cameraExecutor = Executors.newSingleThreadExecutor()
 
-                    startCamera(
-                        previewView = preview,
-                        context = context,
-                        lifecycleOwner = lifecycleOwner,
-                        cameraExecutor = cameraExecutor,
-                        viewModel = viewModel
-                    )
-                    preview
-                },
-                modifier = Modifier
-                    .weight(1f)
-            ) {}
+                        startCamera(
+                            previewView = preview,
+                            context = context,
+                            lifecycleOwner = lifecycleOwner,
+                            cameraExecutor = cameraExecutor,
+                            viewModel = viewModel
+                        )
+                        preview
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+
+                val text = when (viewModel.trainType.value) {
+                    TrainType.SQUAT -> "무릎 각도"
+                    TrainType.PUSHUP -> "팔꿈치 각도"
+                    TrainType.SITUP -> "올라간 정도"
+                    TrainType.RUN -> ""
+                    else -> "문제 발생"
+                }
+
+                Text(
+                    text = "$text ${angle.value.toString()}",
+                    color = Colors.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .align(Alignment.TopStart) // 원하는 위치에 텍스트를 배치합니다.
+                        .padding(20.dp)
+                )
+            }
+
         }
 
-        MyBottomSheetScreen(
-            viewModel = viewModel,
-            modifier = Modifier.align(Alignment.BottomCenter) // 하단에 고정
-        )
+        val trainHistory = viewModel.trainHistoryList.collectAsState().value
+
+        if (trainHistory != null) {
+            MyBottomSheetScreen(
+                viewModel = viewModel,
+                trainHistory = trainHistory,
+                modifier = Modifier.align(Alignment.BottomCenter) // 하단에 고정
+            )
+        }
     }
+
+    FitBattleDialog(
+        showDialog = exitState,
+        title = "훈련 종료",
+        titleColor = Colors.Black,
+        onConfirm = {
+            exitState = false
+            scope.launch {
+                viewModel.saveTrain()
+                navController.navigate("main") {
+                    popUpTo(0)
+                }
+            }
+        },
+        onDismiss = {
+            exitState = false
+        },
+        message = "정말 훈련을 종료하시겠습까?",
+    )
 
     DisposableEffect(lifecycleOwner) {
         onDispose {
@@ -185,7 +250,8 @@ fun TrainScreen(
 @Composable
 fun MyBottomSheetScreen(
     viewModel: TrainViewModel,
-    modifier: Modifier
+    trainHistory: List<TrainHistory>,
+    modifier: Modifier,
 ) {
     val scaffoldState = rememberBottomSheetScaffoldState()
     val count = viewModel.count.observeAsState()
@@ -197,28 +263,51 @@ fun MyBottomSheetScreen(
         sheetMaxWidth = screenWidth,
         scaffoldState = scaffoldState,
         sheetContent = {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .background(Colors.White, RoundedCornerShape(100.dp))
-                    .border(2.dp, Colors.LightPrimaryColor, RoundedCornerShape(100.dp))
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "횟수",
-                    color = Colors.Black,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = count.value.toString(),
-                    color = Colors.Black,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Medium
-                )
+            Column {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                        .background(Colors.White, RoundedCornerShape(100.dp))
+                        .border(2.dp, Colors.LightPrimaryColor, RoundedCornerShape(100.dp))
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "횟수",
+                        color = Colors.Black,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = count.value.toString(),
+                        color = Colors.Black,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                trainHistory.fastForEach {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = it.trainingType,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp,
+                            color = Colors.Black
+                        )
+                        Text(
+                            text = it.count.toString(),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp,
+                            color = Colors.Black
+                        )
+                    }
+
+                }
             }
         },
         sheetPeekHeight = 110.dp, // sheet의 기본 노출 높이
@@ -230,7 +319,7 @@ private fun startCamera(
     context: Context,
     lifecycleOwner: LifecycleOwner,
     cameraExecutor: ExecutorService,
-    viewModel: TrainViewModel
+    viewModel: TrainViewModel,
 ) {
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
     phoneOrientationDetector = PhoneOrientationDetector(context)
