@@ -77,6 +77,7 @@ fun MuscleBattleScreen(
     val context = LocalContext.current
     var giveUpDialogState by remember { mutableStateOf(false) }
     val gameResult by viewModel.gameResult.collectAsState()
+    val gainedStatus = viewModel.gainedStatus.collectAsState().value
 
     BackHandler(enabled = true) {
         giveUpDialogState = true
@@ -204,6 +205,7 @@ fun MuscleBattleScreen(
         GameResultDialog(
             title = gameResult!!.message,
             titleColor = gameResult!!.resultColor,
+            gainedStatus = gainedStatus!!,
             onDismiss = {
                 return@GameResultDialog
             },
@@ -240,6 +242,7 @@ fun MuscleBattleScreen(
 private fun GameResultDialog(
     title: String,
     titleColor: Color,
+    gainedStatus: Map<GainedStatus, Int>,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {
@@ -254,17 +257,42 @@ private fun GameResultDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = title,
-                    color = titleColor,
-                    textAlign = TextAlign.Center,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.SemiBold,
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Colors.White, RoundedCornerShape(12.dp))
-                        .padding(horizontal = 20.dp, vertical = 32.dp)
-                )
+                        .padding(horizontal = 20.dp, vertical = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = title,
+                        color = titleColor,
+                        textAlign = TextAlign.Center,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+
+                    gainedStatus.forEach { (status, value) ->
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = status.label,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 20.sp,
+                                color = Colors.Black
+                            )
+                            Text(
+                                text = value.toString(),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 20.sp,
+                                color = Colors.LightPrimaryColor
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(12.dp))
 

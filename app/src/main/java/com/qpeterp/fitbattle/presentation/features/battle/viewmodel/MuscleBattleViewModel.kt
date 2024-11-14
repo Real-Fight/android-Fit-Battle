@@ -32,6 +32,8 @@ class MuscleBattleViewModel @Inject constructor(
 
     private val _gameResult = MutableStateFlow<GameResult?>(null) // 초기값 null
     val gameResult: StateFlow<GameResult?> = _gameResult
+    private val _gainedStatus = MutableStateFlow<Map<GainedStatus, Int>?>(null)
+    val gainedStatus: StateFlow<Map<GainedStatus, Int>?> get() = _gainedStatus
 
     init {
         webSocketManager.setOnMessageReceived { message ->
@@ -47,6 +49,8 @@ class MuscleBattleViewModel @Inject constructor(
                 }
 
                 is EndGameData -> {
+                    _gainedStatus.value = message.gainedStats
+
                     if (!message.draw) {
                         if (message.winner.keys.contains(BattleConstants.USER_STATUS.id) ) {
                             // 승리
@@ -64,7 +68,7 @@ class MuscleBattleViewModel @Inject constructor(
                     }
                 }
 
-                else -> Log.d(Constant.TAG, "MuscleBattleViewModel F**K $message")
+                else -> Log.d(Constant.TAG, "MuscleBattleViewModel 화난다. $message")
             }
         }
     }
@@ -132,6 +136,7 @@ class MuscleBattleViewModel @Inject constructor(
 
     fun addMyCount() {
         val currentTimeMillis: Long = System.currentTimeMillis()
+        _myCount.value += 1
 
         webSocketManager.sendScoreUpdate(
             roomId = BattleConstants.ROOM_ID,
@@ -140,7 +145,6 @@ class MuscleBattleViewModel @Inject constructor(
             scoreChangeVolume = 1,
             userId = BattleConstants.USER_STATUS.id
         )
-        _myCount.value += 1
     }
 
     fun giveUp() {
