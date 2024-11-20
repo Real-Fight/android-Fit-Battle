@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,9 +28,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,112 +37,100 @@ import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.qpeterp.fitbattle.domain.model.rank.Rank
+import com.qpeterp.fitbattle.presentation.extensions.shimmerEffect
 import com.qpeterp.fitbattle.presentation.features.main.rank.viewmodel.RankingViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
 
 @Composable
 fun RankingScreen(
     navController: NavController,
-    viewModel: RankingViewModel = hiltViewModel()
+    viewModel: RankingViewModel = hiltViewModel(),
 ) {
-    // 화면이 처음 생성될 때 getRankingList 호출
+    val uiState by viewModel.uiState.collectAsState()
+
+    // 화면 로드 시 데이터 불러오기
     LaunchedEffect(Unit) {
-        viewModel.getRankingList()
-        viewModel.getMyRankInfo()
+        viewModel.loadData()
     }
 
-    val rankingList = viewModel.rankingList
-    val myProfileInfo = viewModel.myRankInfo.collectAsState().value
-    val isLoading = viewModel.isLoading.collectAsState().value
+    if (uiState.isLoading) {
+        LoadingScreen()
+    } else {
+        RankingContent(
+            rankingList = uiState.rankingList,
+            myProfileInfo = uiState.myRankInfo
+        )
+    }
+}
 
-    Column(
-        modifier = Modifier.padding(horizontal = 20.dp)
-    ) {
-        if (!isLoading) {
-            Row(
+@Composable
+fun RankingContent(
+    rankingList: List<Rank>,
+    myProfileInfo: Rank,
+) {
+    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(Colors.BackgroundColor, Colors.White),
+                        start = Offset(0f, 0f),
+                        end = Offset(0f, Float.POSITIVE_INFINITY)
+                    ),
+                    RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                )
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 프로필 정보
+            AsyncImage(
+                model = myProfileInfo.profileImgUrl,
+                contentDescription = "My Profile Image",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(Colors.BackgroundColor, Colors.White), // 그라데이션 색상
-                            start = Offset(0f, 0f), // 상단 시작점
-                            end = Offset(0f, Float.POSITIVE_INFINITY) // 하단 끝점
-                        ),
-                        RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                    )
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    AsyncImage(
-                        model = ImageRequest
-                            .Builder(LocalContext.current)
-                            .data(myProfileInfo.profileImgUrl)
-                            .build(),
-                        contentDescription = "My Profile Image",
-                        contentScale = ContentScale.Crop,
-                        imageLoader = ImageLoader(LocalContext.current),
-                        modifier = Modifier
-                            .size(76.dp)
-                            .clip(CircleShape)
-                    )
-                    Column {
-                        Text(
-                            text = myProfileInfo.name,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Colors.Black
-                        )
-                        Text(
-                            text = myProfileInfo.totalPower.toString(),
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Colors.LightPrimaryColor
-                        )
-                    }
-                }
-
+                    .size(76.dp)
+                    .clip(CircleShape)
+            )
+            Column {
                 Text(
-                    text = "No.${myProfileInfo.ranking}",
+                    text = myProfileInfo.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Colors.Black
+                )
+                Text(
+                    text = myProfileInfo.totalPower.toString(),
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Medium,
                     color = Colors.LightPrimaryColor
                 )
             }
+            Text(
+                text = "No.${myProfileInfo.ranking}",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Colors.LightPrimaryColor
+            )
+        }
 
-            Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-            if (rankingList.isEmpty()) {
-                Text(
-                    text = "랭킹에 등록된 유저가 없습니다.",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp,
-                    color = Colors.GrayDark,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 240.dp),
-                    textAlign = TextAlign.Center
-                )
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(rankingList) { item ->
-                        RankCard(item)
-                    }
-                }
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            items(rankingList) { item ->
+                RankCard(item)
             }
         }
     }
 }
 
+
 @Composable
 fun RankCard(
-    item: Rank
+    item: Rank,
 ) {
     Row(
         modifier = Modifier
@@ -201,7 +188,6 @@ fun RankCard(
                         .basicMarquee()
                 )
             }
-
         }
 
         Text(
@@ -210,5 +196,137 @@ fun RankCard(
             fontWeight = FontWeight.Medium,
             color = Colors.LightPrimaryColor
         )
+    }
+}
+
+@Composable
+fun ShimmerRankCard() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Colors.White, RoundedCornerShape(12.dp))
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(10.dp)
+                    .height(24.dp)
+                    .background(color = Colors.GrayLight)
+                    .shimmerEffect(4.dp)
+            )
+            Box(
+                modifier = Modifier
+                    .width(2.dp)
+                    .height(40.dp)
+                    .background(color = Colors.GrayLight)
+                    .shimmerEffect(4.dp)
+            )
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .shimmerEffect(100.dp)
+            )
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(16.dp)
+                        .background(color = Colors.GrayLight)
+                        .shimmerEffect(4.dp)
+                )
+                Box(
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(16.dp)
+                        .background(color = Colors.GrayLight)
+                        .shimmerEffect(4.dp)
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .width(32.dp)
+                .height(40.dp)
+                .background(color = Colors.GrayLight)
+                .shimmerEffect(4.dp)
+        )
+    }
+}
+
+@Composable
+fun LoadingScreen() {
+    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(Colors.BackgroundColor, Colors.White),
+                        start = Offset(0f, 0f),
+                        end = Offset(0f, Float.POSITIVE_INFINITY)
+                    ),
+                    RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                )
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 프로필 정보
+            Box(
+                modifier = Modifier
+                    .size(76.dp)
+                    .clip(CircleShape)
+                    .shimmerEffect(100.dp)
+            )
+            Column {
+                Box(
+                    modifier = Modifier
+                        .width(48.dp)
+                        .height(16.dp)
+                        .shimmerEffect(4.dp),
+                )
+                Box(
+                    modifier = Modifier
+                        .width(64.dp)
+                        .height(16.dp)
+                        .shimmerEffect(4.dp),
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .width(48.dp)
+                    .height(48.dp)
+                    .shimmerEffect(4.dp),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+            ShimmerRankCard()
+        }
     }
 }

@@ -2,84 +2,82 @@ package com.qpeterp.fitbattle.presentation.features.main.rank.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.qpeterp.fitbattle.common.Constant
 import com.qpeterp.fitbattle.domain.model.rank.Rank
 import com.qpeterp.fitbattle.domain.usecase.rank.RankUseCase
-import com.qpeterp.fitbattle.domain.usecase.user.UserProfileUseCase
-import com.qpeterp.fitbattle.domain.usecase.user.UserStatusUseCase
 import com.qpeterp.fitbattle.domain.usecase.user.UserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
+
+data class RankingUiState(
+    val myRankInfo: Rank = Rank(
+        id = UUID.randomUUID(),
+        name = "...",
+        profileImgUrl = "",
+        ranking = 0,
+        totalPower = 0,
+        statusMessage = ""
+    ),
+    val rankingList: List<Rank> = emptyList(),
+    val isLoading: Boolean = true
+)
 
 @HiltViewModel
 class RankingViewModel @Inject constructor(
     private val rankUseCase: RankUseCase,
-    private val userUseCase: UserUseCase,
+    private val userUseCase: UserUseCase
 ) : ViewModel() {
-    private val _myRankInfo = MutableStateFlow(
-        Rank(
-            UUID.randomUUID(),
-            "...",
-            "",
-            0,
-            "",
-            totalPower = 0
-        )
-    )
-    val myRankInfo get() = _myRankInfo
 
-    private val _rankingList = MutableStateFlow<MutableList<Rank>>(mutableListOf())
-    val rankingList get() = _rankingList.value
+    private val _uiState = MutableStateFlow(RankingUiState())
+    val uiState: StateFlow<RankingUiState> = _uiState
 
-    private val _isLoading = MutableStateFlow(true) // 로딩 상태 관리
-    val isLoading: StateFlow<Boolean> = _isLoading
+    fun loadData() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
 
-    private val _page = MutableStateFlow(0)
-    val page get() = _page.value
+            val myRankResult = async { getMyRankInfo() }
+            val rankListResult = async { getRankingList() }
 
-    fun addRankingList(rankingList: List<Rank>) {
-        _rankingList.value.addAll(rankingList)
+            _uiState.value = _uiState.value.copy(
+                myRankInfo = myRankResult.await() ?: _uiState.value.myRankInfo,
+                rankingList = rankListResult.await() ?: emptyList(),
+                isLoading = false
+            )
+        }
     }
 
-    private fun setRankingList(rankingList: List<Rank>) {
-        _rankingList.value.clear()
-        _rankingList.value.addAll(rankingList)
-    }
-
-    suspend fun getRankingList() {
-        _isLoading.value = true
-        rankUseCase(RankUseCase.Param(_page.value))
-            .onSuccess {
-                Log.d(Constant.TAG, "RankList : $it")
-                setRankingList(it)
-                _isLoading.value = false
-            }.onFailure {
-                Log.d(Constant.TAG, "getRankList error : $it")
-                setRankingList(emptyList())
-                _isLoading.value = false
-            }
-    }
-
-    suspend fun getMyRankInfo() {
-        _isLoading.value = true
-        userUseCase()
-            .onSuccess {
-                _myRankInfo.value = Rank(
-                    id = it.id,
-                    name = it.name,
-                    ranking = it.ranking,
-                    profileImgUrl = it.profileImgUrl,
-                    totalPower = it.totalPower,
-                    statusMessage = it.statusMessage
+    private suspend fun getMyRankInfo(): Rank? {
+        return userUseCase()
+            .getOrNull() // Result에서 성공 값(User)을 추출, 실패 시 null 반환
+            ?.let { user ->
+                Rank(
+                    id = user.id,
+                    name = user.name,
+                    profileImgUrl = user.profileImgUrl,
+                    ranking = user.ranking,
+                    totalPower = user.totalPower,
+                    statusMessage = user.statusMessage
                 )
-                _isLoading.value = false
             }
-            .onFailure {
-                Log.d(Constant.TAG, "GetMyRankInfo error : $it")
-                _isLoading.value = false
+            .also {
+                if (it == null) Log.e(Constant.TAG, "GetMyRankInfo error")
+            }
+    }
+
+    private suspend fun getRankingList(): List<Rank>? {
+        return rankUseCase(RankUseCase.Param(0))
+            .getOrNull() // Result에서 성공 값(List<Rank>)을 추출, 실패 시 null 반환
+            ?.also { rankingList ->
+                Log.d(Constant.TAG, "RankList: $rankingList")
+            }
+            .also {
+                if (it == null) Log.e(Constant.TAG, "GetRankingList error")
             }
     }
 }
