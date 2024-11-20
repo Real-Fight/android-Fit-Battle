@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.qpeterp.fitbattle.common.Constant
 import com.qpeterp.fitbattle.data.socket.WebSocketManager
 import com.qpeterp.fitbattle.data.socket.data.EndGameData
+import com.qpeterp.fitbattle.data.socket.data.GainedStatus
 import com.qpeterp.fitbattle.data.socket.data.MatchType
 import com.qpeterp.fitbattle.data.socket.data.ScoreUpdateData
 import com.qpeterp.fitbattle.data.socket.data.StartGameData
@@ -25,8 +26,8 @@ import javax.inject.Inject
 class MuscleBattleViewModel @Inject constructor(
     private val webSocketManager: WebSocketManager
 ) : ViewModel() {
-    private var _remainingTime = MutableStateFlow(30L)
-    val remainingTime: StateFlow<Long> get() = _remainingTime
+    private var _remainingTime = MutableLiveData<Int>(0)
+    val remainingTime: LiveData<Int> get() = _remainingTime
 
     private var countDownTimer: CountDownTimer? = null
 
@@ -40,7 +41,9 @@ class MuscleBattleViewModel @Inject constructor(
             when (message) {
                 is StartGameData -> {
                     val currentTimeMillis: Long = System.currentTimeMillis()
-                    startCountdown(getRemainingTime(currentTimeMillis, message.room.endTimestamp.time))
+                    Log.d(Constant.TAG, "남은 시간 ${getRemainingTime(currentTimeMillis, message.room.endTimestamp.time)}")
+
+                    _remainingTime.value = getRemainingTime(currentTimeMillis, message.room.endTimestamp.time)
                 }
 
                 is ScoreUpdateData -> {
@@ -80,27 +83,11 @@ class MuscleBattleViewModel @Inject constructor(
         BattleConstants.MATCH_TYPE = MatchType.SHORTSQUAT
     }
 
-    // 타이머 시작
-    private fun startCountdown(setTime: Long) {
-        countDownTimer = object : CountDownTimer(setTime, 1_000) {
-            override fun onTick(millisUntilFinished: Long) {
-                // 매 1초마다 남은 시간 갱신
-                Log.d(Constant.TAG, "startCountDown countDownTimer is ${_remainingTime.value}")
-                _remainingTime.value = millisUntilFinished / 1000
-            }
-
-            override fun onFinish() {
-                // 타이머가 끝났을 때 남은 시간을 0으로 설정
-                _remainingTime.value = 0
-            }
-        }.start()
-    }
-
-    private fun getRemainingTime(currentTimeMillis: Long, endTimestamp: Long): Long {
-        val remainingTimeMillis = endTimestamp - currentTimeMillis
+    private fun getRemainingTime(currentTimeMillis: Long, endTimestamp: Long): Int {
+        val remainingTimeMillis = (endTimestamp - currentTimeMillis)
 
         // 남은 시간 차이를 초 단위로 변환
-        return TimeUnit.MILLISECONDS.toSeconds(remainingTimeMillis)
+        return TimeUnit.MILLISECONDS.toSeconds(remainingTimeMillis).toInt()
     }
 
     fun clearGameResult() {
@@ -125,12 +112,10 @@ class MuscleBattleViewModel @Inject constructor(
 
     val myCount: StateFlow<Int>
         get() = _myCount
-
     val rivalCount: StateFlow<Int>
         get() = _rivalCount
 
     private val _fitState = MutableLiveData<PoseType>(PoseType.DOWN)
-
     val fitState: LiveData<PoseType>
         get() = _fitState
 
@@ -144,6 +129,13 @@ class MuscleBattleViewModel @Inject constructor(
             score = _myCount.value,
             scoreChangeVolume = 1,
             userId = BattleConstants.USER_STATUS.id
+        )
+    }
+
+    fun readiedGame() {
+        Log.d(Constant.TAG, "room id : ${BattleConstants.ROOM_ID}")
+        webSocketManager.sendReadied(
+            roomId = BattleConstants.ROOM_ID
         )
     }
 

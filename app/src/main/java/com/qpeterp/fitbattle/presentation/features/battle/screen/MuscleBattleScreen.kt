@@ -62,6 +62,10 @@ import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieAnimatable
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.qpeterp.fitbattle.R
 import com.qpeterp.fitbattle.application.MyApplication
 import com.qpeterp.fitbattle.common.Constant
@@ -91,6 +95,7 @@ fun MuscleBattleScreen(
     val gameResult by viewModel.gameResult.collectAsState()
     val gainedStatus = viewModel.gainedStatus.collectAsState().value
     val fitState = viewModel.fitState.observeAsState()
+    var readyState by remember { mutableStateOf(false) }
 
     BackHandler(enabled = true) {
         giveUpDialogState = true
@@ -105,7 +110,7 @@ fun MuscleBattleScreen(
 
     if (MyApplication.prefs.ttsState && fitState.value == PoseType.UP) {
         tts.value?.speak(
-            (myCount.value+1).toString(),
+            (myCount.value + 1).toString(),
             TextToSpeech.QUEUE_FLUSH,
             null,
             ""
@@ -138,121 +143,126 @@ fun MuscleBattleScreen(
             .fillMaxSize()
             .padding(top = 12.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        if (readyState) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .background(
-                        Colors.GrayLight,
-                        RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp)
-                    )
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "남은 시간",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 20.sp
-                )
-                if (remainTime.value != 0) {
-                    Timer(remainTime.value!!)
-                }
-            }
-
-            Icon(
-                imageVector = Icons.Outlined.Logout,
-                contentDescription = "icon to give up",
-                tint = Colors.Red,
-                modifier = Modifier
-                    .size(54.dp)
-                    .padding(top = 4.dp, end = 20.dp)
-                    .fitBattleClickable { giveUpDialogState = true },
-            )
-        }
-
-        MuscleUserProfileCard(
-            profileUrl = rivalInfo.profileUrl,
-            name = rivalInfo.name,
-            ranking = rivalInfo.ranking,
-            count = rivalCount.value
-        )
-        Box(
-            modifier = Modifier.weight(1F)
-        ) {
-            val move: Int
-            val basic: Int
-            val vertical: Boolean
-            when (BattleConstants.FIT_TYPE) {
-                TrainType.SQUAT -> {
-                    move = R.drawable.item_squat_move
-                    basic = R.drawable.item_squat_basic
-                    vertical = true
-                }
-
-                TrainType.PUSHUP -> {
-                    move = R.drawable.item_push_up_move
-                    basic = R.drawable.item_push_up_basic
-                    vertical = false
-                }
-
-                TrainType.SITUP -> {
-                    move = R.drawable.item_situp_move
-                    basic = R.drawable.item_situp_basic
-                    vertical = false
-                }
-
-                else -> {
-                    move = R.drawable.item_squat_move
-                    basic = R.drawable.item_squat_basic
-                    vertical = true
-                }
-            }
-            // AndroidView를 Box 전체를 채우도록 설정
-            AndroidView(
-                factory = { context ->
-                    val preview = PreviewView(context).apply {
-                        layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .background(
+                            Colors.GrayLight,
+                            RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp)
                         )
-                    }
-                    val cameraExecutor = Executors.newSingleThreadExecutor()
-                    startCamera(
-                        previewView = preview,
-                        context = context,
-                        lifecycleOwner = lifecycleOwner,
-                        cameraExecutor = cameraExecutor,
-                        viewModel = viewModel
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                ) {
+                    Text(
+                        text = "남은 시간",
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 20.sp
                     )
-                    preview
-                },
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+                    if (remainTime.value != 0) {
+                        Timer(remainTime.value!!)
+                    }
+                }
 
-            // 아이콘을 중앙에 배치
-            Icon(
-                painter = if (fitState.value == PoseType.DOWN) painterResource(basic) else painterResource(
-                    move
-                ),
-                contentDescription = "exercise example image",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(420.dp) // 아이콘 크기 조정 필요시
-                    .rotate(if (vertical) 0F else 90F)
+                Icon(
+                    imageVector = Icons.Outlined.Logout,
+                    contentDescription = "icon to give up",
+                    tint = Colors.Red,
+                    modifier = Modifier
+                        .size(54.dp)
+                        .padding(top = 4.dp, end = 20.dp)
+                        .fitBattleClickable { giveUpDialogState = true },
+                )
+            }
+
+            MuscleUserProfileCard(
+                profileUrl = rivalInfo.profileUrl,
+                name = rivalInfo.name,
+                ranking = rivalInfo.ranking,
+                count = rivalCount.value
             )
+            Box(
+                modifier = Modifier.weight(1F)
+            ) {
+                val move: Int
+                val basic: Int
+                val vertical: Boolean
+                when (BattleConstants.FIT_TYPE) {
+                    TrainType.SQUAT -> {
+                        move = R.drawable.item_squat_move
+                        basic = R.drawable.item_squat_basic
+                        vertical = true
+                    }
+
+                    TrainType.PUSH_UP -> {
+                        move = R.drawable.item_push_up_move
+                        basic = R.drawable.item_push_up_basic
+                        vertical = false
+                    }
+
+                    TrainType.SIT_UP -> {
+                        move = R.drawable.item_situp_move
+                        basic = R.drawable.item_situp_basic
+                        vertical = false
+                    }
+
+                    else -> {
+                        move = R.drawable.item_squat_move
+                        basic = R.drawable.item_squat_basic
+                        vertical = true
+                    }
+                }
+                // AndroidView를 Box 전체를 채우도록 설정
+                AndroidView(
+                    factory = { context ->
+                        val preview = PreviewView(context).apply {
+                            layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT
+                            )
+                        }
+                        val cameraExecutor = Executors.newSingleThreadExecutor()
+                        startCamera(
+                            previewView = preview,
+                            context = context,
+                            lifecycleOwner = lifecycleOwner,
+                            cameraExecutor = cameraExecutor,
+                            viewModel = viewModel
+                        )
+                        preview
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+
+                // 아이콘을 중앙에 배치
+                Icon(
+                    painter = if (fitState.value == PoseType.DOWN) painterResource(basic) else painterResource(
+                        move
+                    ),
+                    contentDescription = "exercise example image",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(420.dp) // 아이콘 크기 조정 필요시
+                        .rotate(if (vertical) 0F else 90F)
+                )
+            }
+
+            MuscleUserProfileCard(
+                profileUrl = userInfo.profileUrl,
+                name = userInfo.name,
+                ranking = userInfo.ranking,
+                count = myCount.value
+            )
+        } else {
+            LottieAnimationOnce(onAnimationEnd = { readyState = true })
+            viewModel.readiedGame()
         }
-
-        MuscleUserProfileCard(
-            profileUrl = userInfo.profileUrl,
-            name = userInfo.name,
-            ranking = userInfo.ranking,
-            count = myCount.value
-        )
     }
 
     if (gameResult != null) {
@@ -289,6 +299,41 @@ fun MuscleBattleScreen(
         onDispose {
             phoneOrientationDetector.unregister()
         }
+    }
+}
+
+@Composable
+fun LottieAnimationOnce(onAnimationEnd: () -> Unit) {
+    // Lottie composition 로드
+    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("count_down.json"))
+
+    // LottieAnimatable 생성
+    val animatable = rememberLottieAnimatable()
+
+    // 애니메이션 실행 및 완료 감지
+    LaunchedEffect(composition) {
+        if (composition != null) {
+            animatable.animate(
+                composition = composition,
+                iterations = 1 // 1회만 실행
+            )
+            // 애니메이션 완료 후 콜백 호출
+            onAnimationEnd()
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Lottie 애니메이션 UI
+        LottieAnimation(
+            composition = composition,
+            progress = animatable.progress,
+            modifier = Modifier
+                .size(200.dp)
+                .fillMaxSize()
+                .align(Alignment.Center)
+        )
     }
 }
 

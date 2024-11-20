@@ -2,6 +2,7 @@ package com.qpeterp.fitbattle.presentation.features.battle.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.qpeterp.fitbattle.common.Constant
 import com.qpeterp.fitbattle.data.socket.WebSocketManager
 import com.qpeterp.fitbattle.data.socket.data.EmptyData
@@ -9,7 +10,9 @@ import com.qpeterp.fitbattle.data.socket.data.MatchedData
 import com.qpeterp.fitbattle.domain.model.battle.user.User
 import com.qpeterp.fitbattle.presentation.features.battle.common.BattleConstants
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +47,10 @@ class LoadingViewModel @Inject constructor(
                         profileUrl = message.userProfileImgUrl,
                         ranking = message.userRanking.toString()
                     )
-                    matchingState.value = true
+
+                    viewModelScope.launch {
+                        matched()
+                    }
                 }
 
                 else -> {
@@ -60,14 +66,14 @@ class LoadingViewModel @Inject constructor(
         matchingState.value = !matchingState.value
     }
 
-    fun readiedGame() {
-        Log.d(Constant.TAG, "room id : ${BattleConstants.ROOM_ID}")
-        webSocketManager.sendReadied(
-            roomId = BattleConstants.ROOM_ID
-        )
-    }
-
     fun matchingCancel() {
         webSocketManager.sendMatchCancel()
+    }
+
+    private suspend fun matched() {
+        setMatchingState()
+
+        delay(2000)
+        matchingState.value = true
     }
 }
