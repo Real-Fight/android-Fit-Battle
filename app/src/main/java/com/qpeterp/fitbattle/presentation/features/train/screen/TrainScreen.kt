@@ -67,6 +67,9 @@ import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import com.qpeterp.fitbattle.presentation.features.train.viewmodel.TrainViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
 import kotlinx.coroutines.launch
+import java.sql.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -291,7 +294,10 @@ fun MyBottomSheetScreen(
                 trainHistory.fastForEach {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
                     ) {
                         Text(
                             text = it.trainingType,
@@ -305,6 +311,14 @@ fun MyBottomSheetScreen(
                             fontSize = 20.sp,
                             color = Colors.Black
                         )
+                        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                        val date = sdf.parse(it.createdAt)  // Parse the String into a Date
+                        Text(
+                            text = formatTime(Timestamp(date.time)),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 20.sp,
+                            color = Colors.Black
+                        )
                     }
 
                 }
@@ -313,6 +327,16 @@ fun MyBottomSheetScreen(
         sheetPeekHeight = 110.dp, // sheet의 기본 노출 높이
     ) {}
 }
+
+private fun formatTime(timestamp: Timestamp): String {
+    // Get the time in milliseconds from the Timestamp
+    val date = Date(timestamp.time)  // Use timestamp.time, which returns the time in milliseconds
+    val sdf = SimpleDateFormat("yyyy-MM-dd")
+    val formattedDate = sdf.format(date)
+
+    return formattedDate  // Prints the formatted date
+}
+
 
 private fun startCamera(
     previewView: PreviewView,

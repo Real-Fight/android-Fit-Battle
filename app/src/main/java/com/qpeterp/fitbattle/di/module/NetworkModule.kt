@@ -70,4 +70,9 @@ class NetworkModule {
     @Singleton
     fun provideUserService(retrofit: Retrofit): UserService =
         retrofit.create(UserService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideTrainService(retrofit: Retrofit): TrainService =
+        retrofit.create(TrainService::class.java)
 }
