@@ -58,6 +58,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.qpeterp.fitbattle.application.MyApplication
 import com.qpeterp.fitbattle.common.Constant
+import com.qpeterp.fitbattle.domain.model.pose.PoseType
 import com.qpeterp.fitbattle.domain.model.train.TrainHistory
 import com.qpeterp.fitbattle.domain.model.train.TrainType
 import com.qpeterp.fitbattle.domain.usecase.pose.train.ImageAnalyzer
@@ -116,8 +117,8 @@ fun TrainScreen(
     LaunchedEffect(Unit) {
         when (trainType) {
             "스쿼트" -> viewModel.setTrainType(TrainType.SQUAT)
-            "푸쉬업" -> viewModel.setTrainType(TrainType.PUSHUP)
-            "윗몸 일으키기" -> viewModel.setTrainType(TrainType.SITUP)
+            "푸쉬업" -> viewModel.setTrainType(TrainType.PUSH_UP)
+            "윗몸 일으키기" -> viewModel.setTrainType(TrainType.SIT_UP)
         }
     }
 
@@ -186,8 +187,8 @@ fun TrainScreen(
 
                 val text = when (viewModel.trainType.value) {
                     TrainType.SQUAT -> "무릎 각도"
-                    TrainType.PUSHUP -> "팔꿈치 각도"
-                    TrainType.SITUP -> "올라간 정도"
+                    TrainType.PUSH_UP -> "팔꿈치 각도"
+                    TrainType.SIT_UP -> "올라간 정도"
                     TrainType.RUN -> ""
                     else -> "문제 발생"
                 }

@@ -1,4 +1,4 @@
-package com.qpeterp.fitbattle.domain.usecase.pose
+package com.qpeterp.fitbattle.domain.usecase.pose.battle
 
 import android.util.Log
 import com.google.mlkit.vision.pose.Pose

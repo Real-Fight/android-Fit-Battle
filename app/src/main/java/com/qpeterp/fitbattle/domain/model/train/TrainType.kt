@@ -8,11 +8,11 @@ enum class TrainType(
         "스쿼트",
         true
     ),
-    PUSHUP(
+    PUSH_UP(
         "푸쉬업",
         false
     ),
-    SITUP(
+    SIT_UP(
         "윗몸 일으키기",
         false
     ),

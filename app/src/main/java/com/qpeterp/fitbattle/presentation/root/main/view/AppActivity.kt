@@ -10,13 +10,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
 import com.qpeterp.fitbattle.application.MyApplication
 import com.qpeterp.fitbattle.application.PreferenceManager
-import com.qpeterp.fitbattle.presentation.core.component.FitBattleDialog
 import com.qpeterp.fitbattle.presentation.root.navigation.NavigationGraph
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -1,5 +1,7 @@
 package com.qpeterp.fitbattle.presentation.features.main.home.screen
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -35,8 +37,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,6 +61,7 @@ fun HomeScreen(
     val screenScrollState = rememberScrollState()
     val challengeScrollState = rememberScrollState()
     val isLoading = viewModel.isLoading.collectAsState().value
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.getQuest()
@@ -65,7 +70,7 @@ fun HomeScreen(
     if (!isLoading) {
         val quest = viewModel.quest.value!!
 
-        val questTypeIcon = when(quest.questType) {
+        val questTypeIcon = when (quest.questType) {
             QuestType.MATCH -> painterResource(R.drawable.ic_strength)
             QuestType.SQUAT -> painterResource(R.drawable.ic_muclse)
             QuestType.PUSHUP -> painterResource(R.drawable.ic_muclse)
@@ -152,20 +157,26 @@ fun HomeScreen(
                 ChallengeCard(
                     mainColor = Colors.LightPrimaryColor,
                     subColor = Colors.LightPrimaryColorDark,
-                    title = "전신 7X4\n챌린지",
-                    content = "온 몸의 근육들을 파괴해보세요!",
-                    animation = "", // TODO: 애니메이션 추가 얘정
+                    title = "개발자를\n이겨라!",
+                    eventDate = "챌린지 기간 : 11월 30일 ~ 12월 30일",
+                    content = "개발자의 기록을\n" +
+                            "뛰어넘어,\n" +
+                            "강함을 증명하세요!"
                 ) {
 
                 }
                 ChallengeCard(
-                    mainColor = Colors.DarkPrimaryColor,
-                    subColor = Colors.DarkPrimaryColorDark,
-                    title = "문가인 챌린지",
-                    content = "문가인을 뛰어넘어 보세요!",
-                    animation = "" // TODO: 애니메이션 추가 얘정
+                    mainColor = Color(0xFFF0B343),
+                    subColor = Color(0xFFBE7F00),
+                    title = "운동의 신",
+                    eventDate = "챌린지 기간 : 11월 20일 ~ 12월 12일",
+                    content = "기간 내에\n" +
+                            "누적 운동 횟수\n" +
+                            "1500회에 도전하세요!"
                 ) {
-
+                    // Open the URL when the text is clicked
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://excessive-cashew-b68.notion.site/11-13d20279f6ea805a86daee7904abb48f?pvs=73"))
+                    context.startActivity(intent)
                 }
             }
 
@@ -246,7 +257,9 @@ private fun TodayMissionButton(
         modifier = Modifier
             .size(72.dp)
             .paint(
-                painter = if (isCompleted) painterResource(R.drawable.bac_mission_complete) else painterResource(R.drawable.bac_mission_button),
+                painter = if (isCompleted) painterResource(R.drawable.bac_mission_complete) else painterResource(
+                    R.drawable.bac_mission_button
+                ),
                 contentScale = ContentScale.Fit,
             )
             .clickable { onClick() }
@@ -269,10 +282,10 @@ private fun ChallengeCard(
     mainColor: Color,
     subColor: Color,
     title: String,
-    content: String,
+    eventDate: String,
     textColor: Color = Colors.White,
     buttonColor: Color = Colors.White,
-    animation: String, // 추후, 업데이트 예정
+    content: String, // 추후, 업데이트 예정
     onClick: () -> Unit,
 ) {
     Box(
@@ -296,6 +309,15 @@ private fun ChallengeCard(
             modifier = Modifier.align(Alignment.TopStart)
         )
 
+        Text(
+            text = content,
+            textAlign = TextAlign.End,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = textColor,
+            modifier = Modifier.align(Alignment.TopEnd)
+        )
+
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -303,7 +325,7 @@ private fun ChallengeCard(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = content,
+                text = eventDate,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = textColor,

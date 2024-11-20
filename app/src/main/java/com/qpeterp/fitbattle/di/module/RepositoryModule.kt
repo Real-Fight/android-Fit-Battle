@@ -2,9 +2,11 @@ package com.qpeterp.fitbattle.di.module
 
 import com.qpeterp.fitbattle.data.repository.AuthRepositoryImpl
 import com.qpeterp.fitbattle.data.repository.RankRepositoryImpl
+import com.qpeterp.fitbattle.data.repository.TrainRepositoryImpl
 import com.qpeterp.fitbattle.data.repository.UserRepositoryImpl
 import com.qpeterp.fitbattle.domain.repository.AuthRepository
 import com.qpeterp.fitbattle.domain.repository.RankRepository
+import com.qpeterp.fitbattle.domain.repository.TrainRepository
 import com.qpeterp.fitbattle.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -32,4 +34,10 @@ abstract class RepositoryModule {
     abstract fun providesUserRepository(
         userRepositoryImpl: UserRepositoryImpl
     ): UserRepository
+
+    @Singleton
+    @Binds
+    abstract fun providesTrainRepository(
+        trainRepositoryImpl: TrainRepositoryImpl
+    ): TrainRepository
 }

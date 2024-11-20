@@ -14,6 +14,7 @@ class PreferenceManager(context: Context) {
 
     fun clearToken() {
         token = ""
+        ttsState = false
     }
 
     companion object {
