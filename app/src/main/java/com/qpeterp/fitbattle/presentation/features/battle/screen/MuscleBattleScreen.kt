@@ -13,6 +13,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,17 +33,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -57,13 +62,20 @@ import androidx.navigation.NavController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
+import com.qpeterp.fitbattle.R
+import com.qpeterp.fitbattle.application.MyApplication
 import com.qpeterp.fitbattle.common.Constant
+import com.qpeterp.fitbattle.data.socket.data.GainedStatus
+import com.qpeterp.fitbattle.domain.model.pose.PoseType
+import com.qpeterp.fitbattle.domain.model.train.TrainType
 import com.qpeterp.fitbattle.domain.usecase.pose.PhoneOrientationDetector
 import com.qpeterp.fitbattle.domain.usecase.pose.battle.ImageAnalyzer
 import com.qpeterp.fitbattle.presentation.core.component.FitBattleDialog
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
+import com.qpeterp.fitbattle.presentation.features.battle.common.BattleConstants
 import com.qpeterp.fitbattle.presentation.features.battle.viewmodel.MuscleBattleViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
+import kotlinx.coroutines.delay
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -78,6 +90,7 @@ fun MuscleBattleScreen(
     var giveUpDialogState by remember { mutableStateOf(false) }
     val gameResult by viewModel.gameResult.collectAsState()
     val gainedStatus = viewModel.gainedStatus.collectAsState().value
+    val fitState = viewModel.fitState.observeAsState()
 
     BackHandler(enabled = true) {
         giveUpDialogState = true
@@ -87,11 +100,7 @@ fun MuscleBattleScreen(
     val remainTime = viewModel.remainingTime.observeAsState()
     val userInfo = viewModel.userInfo
     val rivalInfo = viewModel.rivalInfo
-
-    Log.d(Constant.TAG, "rival info: $rivalInfo user info: $userInfo")
-
     val myCount = viewModel.myCount.collectAsState()
-
     val tts = rememberTextToSpeech()
 
     if (MyApplication.prefs.ttsState && fitState.value == PoseType.UP) {
@@ -171,27 +180,72 @@ fun MuscleBattleScreen(
             ranking = rivalInfo.ranking,
             count = rivalCount.value
         )
-
-        AndroidView(
-            factory = { context ->
-                val preview = PreviewView(context).apply {
-                    layoutParams?.width = ViewGroup.LayoutParams.MATCH_PARENT
-                    layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
+        Box(
+            modifier = Modifier.weight(1F)
+        ) {
+            val move: Int
+            val basic: Int
+            val vertical: Boolean
+            when (BattleConstants.FIT_TYPE) {
+                TrainType.SQUAT -> {
+                    move = R.drawable.item_squat_move
+                    basic = R.drawable.item_squat_basic
+                    vertical = true
                 }
-                val cameraExecutor = Executors.newSingleThreadExecutor()
 
-                startCamera(
-                    previewView = preview,
-                    context = context,
-                    lifecycleOwner = lifecycleOwner,
-                    cameraExecutor = cameraExecutor,
-                    viewModel = viewModel
-                )
-                preview
-            },
-            modifier = Modifier
-                .weight(1f)
-        ) {}
+                TrainType.PUSHUP -> {
+                    move = R.drawable.item_push_up_move
+                    basic = R.drawable.item_push_up_basic
+                    vertical = false
+                }
+
+                TrainType.SITUP -> {
+                    move = R.drawable.item_situp_move
+                    basic = R.drawable.item_situp_basic
+                    vertical = false
+                }
+
+                else -> {
+                    move = R.drawable.item_squat_move
+                    basic = R.drawable.item_squat_basic
+                    vertical = true
+                }
+            }
+            // AndroidView를 Box 전체를 채우도록 설정
+            AndroidView(
+                factory = { context ->
+                    val preview = PreviewView(context).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                        )
+                    }
+                    val cameraExecutor = Executors.newSingleThreadExecutor()
+                    startCamera(
+                        previewView = preview,
+                        context = context,
+                        lifecycleOwner = lifecycleOwner,
+                        cameraExecutor = cameraExecutor,
+                        viewModel = viewModel
+                    )
+                    preview
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+
+            // 아이콘을 중앙에 배치
+            Icon(
+                painter = if (fitState.value == PoseType.DOWN) painterResource(basic) else painterResource(
+                    move
+                ),
+                contentDescription = "exercise example image",
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(420.dp) // 아이콘 크기 조정 필요시
+                    .rotate(if (vertical) 0F else 90F)
+            )
+        }
 
         MuscleUserProfileCard(
             profileUrl = userInfo.profileUrl,
@@ -316,7 +370,6 @@ private fun GameResultDialog(
                     )
                 }
             }
-
         },
         confirmButton = {},
     )
@@ -420,17 +473,17 @@ private fun startCamera(
 
 @Composable
 fun Timer(timeLeft: Int) {
-    var timeLeft by remember { mutableStateOf(timeLeft) }
+    var leftTime by remember { mutableStateOf(timeLeft) }
 
     LaunchedEffect(true) {
-        while (timeLeft > 0) {
+        while (leftTime > 0) {
             delay(1000) // 1초 대기
-            timeLeft -= 1 // 시간 감소
+            leftTime -= 1 // 시간 감소
         }
     }
 
     Text(
-        text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+        text = String.format("%02d:%02d", leftTime / 60, leftTime % 60),
         fontSize = 24.sp,
         fontWeight = FontWeight.SemiBold
     )
