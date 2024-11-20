@@ -324,9 +324,6 @@ fun LoadingScreen() {
             ShimmerRankCard()
             ShimmerRankCard()
             ShimmerRankCard()
-            ShimmerRankCard()
-            ShimmerRankCard()
-            ShimmerRankCard()
         }
     }
 }
