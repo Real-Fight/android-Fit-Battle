@@ -87,8 +87,10 @@ fun TrainScreen(
     val scope = rememberCoroutineScope()
 
     val tts = rememberTextToSpeech()
-    val squatState = viewModel.fitState.observeAsState()
+    val fitState = viewModel.fitState.observeAsState()
     val angle = viewModel.angle.observeAsState()
+
+    var ttsState by remember { mutableStateOf(PoseType.UP) }
 
     LifecycleStartEffect(Unit) {
         // lifecycle start 시 할것,
@@ -119,24 +121,15 @@ fun TrainScreen(
         }
     }
 
-//    isSpeaking.value = if (tts.value?.isSpeaking == true) {
-//        tts.value?.stop()
-//        false
-//    } else {
-//        tts.value?.speak(
-//            squatState.value?.message,
-//            TextToSpeech.QUEUE_FLUSH,
-//            null,
-//            ""
-//        )
-//        true
-//    }
-    tts.value?.speak(
-        squatState.value?.message,
-        TextToSpeech.QUEUE_FLUSH,
-        null,
-        ""
-    )
+    if (MyApplication.prefs.ttsState && fitState.value == ttsState) {
+        ttsState = if (ttsState == PoseType.DOWN) PoseType.UP else PoseType.DOWN
+        tts.value?.speak(
+            fitState.value?.message,
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            ""
+        )
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()

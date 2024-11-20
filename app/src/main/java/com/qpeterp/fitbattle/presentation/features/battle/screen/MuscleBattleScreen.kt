@@ -84,7 +84,7 @@ fun MuscleBattleScreen(
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    val remainTime = viewModel.remainingTime.collectAsState()
+    val remainTime = viewModel.remainingTime.observeAsState()
     val userInfo = viewModel.userInfo
     val rivalInfo = viewModel.rivalInfo
 
@@ -94,12 +94,14 @@ fun MuscleBattleScreen(
 
     val tts = rememberTextToSpeech()
 
-    tts.value?.speak(
-        myCount.value.toString(),
-        TextToSpeech.QUEUE_FLUSH,
-        null,
-        ""
-    )
+    if (MyApplication.prefs.ttsState && fitState.value == PoseType.UP) {
+        tts.value?.speak(
+            (myCount.value+1).toString(),
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            ""
+        )
+    }
 
     val rivalCount = viewModel.rivalCount.collectAsState()
 
@@ -147,11 +149,9 @@ fun MuscleBattleScreen(
                     fontWeight = FontWeight.Medium,
                     fontSize = 20.sp
                 )
-                Text(
-                    text = remainTime.value.toString(),
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 32.sp
-                )
+                if (remainTime.value != 0) {
+                    Timer(remainTime.value!!)
+                }
             }
 
             Icon(
@@ -416,4 +416,22 @@ private fun startCamera(
         }
 
     }, ContextCompat.getMainExecutor(context))
+}
+
+@Composable
+fun Timer(timeLeft: Int) {
+    var timeLeft by remember { mutableStateOf(timeLeft) }
+
+    LaunchedEffect(true) {
+        while (timeLeft > 0) {
+            delay(1000) // 1초 대기
+            timeLeft -= 1 // 시간 감소
+        }
+    }
+
+    Text(
+        text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+        fontSize = 24.sp,
+        fontWeight = FontWeight.SemiBold
+    )
 }
