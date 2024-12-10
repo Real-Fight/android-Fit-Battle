@@ -19,12 +19,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import app.rive.runtime.kotlin.RiveAnimationView
 import app.rive.runtime.kotlin.controllers.RiveFileController
 import app.rive.runtime.kotlin.core.Alignment
-import app.rive.runtime.kotlin.core.ExperimentalAssetLoader
 import app.rive.runtime.kotlin.core.Fit
 import app.rive.runtime.kotlin.core.Loop
 import app.rive.runtime.kotlin.core.PlayableInstance
+import com.qpeterp.fitbattle.R
 
-@OptIn(ExperimentalAssetLoader::class)
 @Suppress("LongMethod")
 @Composable
 fun RiveAnimation(
@@ -52,7 +51,7 @@ fun RiveAnimation(
     if (LocalInspectionMode.current) { // For Developing only,
         Image(
             modifier = modifier.size(100.dp),
-            painter = painterResource(id = androidx.core.R.drawable.ic_call_answer),
+            painter = painterResource(id = R.drawable.ic_strength),
             contentDescription = contentDescription,
         )
     } else {

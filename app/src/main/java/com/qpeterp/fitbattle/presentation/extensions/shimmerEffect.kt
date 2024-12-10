@@ -18,8 +18,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 
-fun Modifier.shimmerEffect(radius: Dp): Modifier = composed {
+fun Modifier.shimmerEffect(radius: Dp = 4.dp): Modifier = composed {
     var size by remember { mutableStateOf(IntSize.Zero) }
     val transition = rememberInfiniteTransition(label = "")
     val startOffsetX by transition.animateFloat(
