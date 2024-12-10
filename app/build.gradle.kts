@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+
     id("com.google.devtools.ksp")
     id("dagger.hilt.android.plugin")
     kotlin("plugin.serialization") version "1.9.0" // 사용할 Kotlin 버전으로 변경하세요.
@@ -13,7 +14,7 @@ properties.load(project.rootProject.file("local.properties").inputStream())
 
 android {
     namespace = "com.qpeterp.fitbattle"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.qpeterp.fitbattle"
@@ -35,6 +36,9 @@ android {
         }
 
         release {
+            buildConfigField("String", "BASE_URL", "${properties["BASE_URL"]}")
+            buildConfigField("String", "SOCKET_URL", "${properties["SOCKET_URL"]}")
+
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -64,6 +68,9 @@ android {
 }
 
 dependencies {
+    // Lottie animation
+    implementation("com.airbnb.android:lottie-compose:6.0.1")
+
     // Rive
     // During initialization, you may need to add a dependency
     // for Jetpack Startup
@@ -97,6 +104,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     // coil image url
     implementation(libs.coil.compose)
+    // okhttp
     implementation(libs.coil.network.okhttp)
     // icon
     implementation(libs.androidx.material.icons.extended) // 최신 버전 사용
