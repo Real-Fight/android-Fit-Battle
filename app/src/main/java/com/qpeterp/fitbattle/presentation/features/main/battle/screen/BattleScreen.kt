@@ -34,14 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import app.rive.runtime.kotlin.core.ExperimentalAssetLoader
 import com.qpeterp.fitbattle.R
 import com.qpeterp.fitbattle.data.socket.data.MatchType
 import com.qpeterp.fitbattle.domain.model.train.TrainType
+import com.qpeterp.fitbattle.presentation.core.component.RiveAnimation
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
 import com.qpeterp.fitbattle.presentation.features.main.battle.viewmodel.BattleViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
-import com.qpeterp.fitbattle.presentation.core.component.RiveAnimation
 
 @Composable
 fun BattleScreen(
@@ -125,7 +124,6 @@ fun BattleScreen(
     }
 }
 
-@OptIn(ExperimentalAssetLoader::class)
 @Composable
 private fun BattleCard(
     title: String,
@@ -170,7 +168,7 @@ private fun BattleCard(
             }
 
             TrainType.SIT_UP -> {
-                R.raw.squat
+                R.raw.sit_up
             }
 
             TrainType.RUN -> {
@@ -244,7 +242,7 @@ fun ChoiceBattleModeDialog(
     onCancel: () -> Unit,
     onConfirm: (MatchType, TrainType) -> Unit,
 ) {
-    val options = listOf("단기전" to "30초", "중기전" to "5분", "장기전" to "30분")
+    val options = listOf("단기전" to "30초", "중기전" to "3분", "장기전" to "10분")
 
     AlertDialog(
         containerColor = Colors.White,

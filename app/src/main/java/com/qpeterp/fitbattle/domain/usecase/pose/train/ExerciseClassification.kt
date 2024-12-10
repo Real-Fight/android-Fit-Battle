@@ -108,12 +108,12 @@ class ExerciseClassification(
                 basicPose = targetSquatBasicPose
             }
 
-            TrainType.PUSHUP -> {
+            TrainType.PUSH_UP -> {
                 movePose = targetPushUpMovePose
                 basicPose = targetPushUpBasicPose
             }
 
-            TrainType.SITUP -> {
+            TrainType.SIT_UP -> {
                 movePose = targetSitUpMovePose
                 basicPose = targetSitUpBasicPose
             }
@@ -151,13 +151,13 @@ class ExerciseClassification(
                 if (!phoneOrientationDetector.verticalHilt) return // check phone inclination horizontal
             }
 
-            TrainType.PUSHUP -> {
+            TrainType.PUSH_UP -> {
                 if (pose.getPoseLandmark(14) == null || pose.getPoseLandmark(30) == null) return
                 if (pose.getPoseLandmark(14)!!.inFrameLikelihood < 0.92 || pose.getPoseLandmark(30)!!.inFrameLikelihood < 0.92) return
                 if (phoneOrientationDetector.verticalHilt) return // check phone inclination vertical
             }
 
-            TrainType.SITUP -> {
+            TrainType.SIT_UP -> {
                 if (pose.getPoseLandmark(24) == null || pose.getPoseLandmark(12) == null) return
                 if (pose.getPoseLandmark(24)!!.inFrameLikelihood < 0.92 || pose.getPoseLandmark(12)!!.inFrameLikelihood < 0.92) return
                 if (phoneOrientationDetector.verticalHilt) return // check phone inclination vertical

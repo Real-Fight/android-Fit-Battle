@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.qpeterp.fitbattle.BuildConfig
 import com.qpeterp.fitbattle.data.remote.service.AuthService
 import com.qpeterp.fitbattle.data.remote.service.RankService
+import com.qpeterp.fitbattle.data.remote.service.TrainService
 import com.qpeterp.fitbattle.data.remote.service.UserService
 import dagger.Module
 import dagger.Provides

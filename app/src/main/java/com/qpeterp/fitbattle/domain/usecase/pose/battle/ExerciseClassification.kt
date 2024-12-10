@@ -10,7 +10,6 @@ import com.qpeterp.fitbattle.domain.model.pose.TargetPose
 import com.qpeterp.fitbattle.domain.model.pose.TargetShape
 import com.qpeterp.fitbattle.domain.model.train.TrainType
 import com.qpeterp.fitbattle.domain.usecase.pose.PhoneOrientationDetector
-import com.qpeterp.fitbattle.domain.usecase.pose.PoseMatcher
 import com.qpeterp.fitbattle.presentation.features.battle.common.BattleConstants
 import com.qpeterp.fitbattle.presentation.features.battle.viewmodel.MuscleBattleViewModel
 
@@ -22,16 +21,10 @@ class ExerciseClassification(
     private val targetSquatMovePose: TargetPose = TargetPose(
         listOf(
             TargetShape(
-                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 100.0
+                PoseLandmark.LEFT_ANKLE, PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, 90.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_ANKLE, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, 100.0
-            ),
-            TargetShape(
-                PoseLandmark.LEFT_KNEE, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_SHOULDER, 100.0
-            ),
-            TargetShape(
-                PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_SHOULDER, 100.0
+                PoseLandmark.RIGHT_ANKLE, PoseLandmark.RIGHT_KNEE, PoseLandmark.RIGHT_HIP, 90.0
             ),
         )
     )
@@ -60,7 +53,7 @@ class ExerciseClassification(
                 170.0
             ),
             TargetShape(
-                PoseLandmark.LEFT_SHOULDER, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_HEEL, 180.0
+                PoseLandmark.LEFT_SHOULDER, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_HEEL, 170.0
             ),
             TargetShape(
                 PoseLandmark.RIGHT_WRIST,
@@ -69,7 +62,7 @@ class ExerciseClassification(
                 170.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 180.0
+                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 170.0
             ),
         )
     )
@@ -82,7 +75,7 @@ class ExerciseClassification(
                 80.0
             ),
             TargetShape(
-                PoseLandmark.LEFT_SHOULDER, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_HEEL, 180.0
+                PoseLandmark.LEFT_SHOULDER, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_HEEL, 170.0
             ),
             TargetShape(
                 PoseLandmark.RIGHT_WRIST,
@@ -91,7 +84,7 @@ class ExerciseClassification(
                 80.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 180.0
+                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 170.0
             ),
         )
     )
@@ -101,10 +94,19 @@ class ExerciseClassification(
                 PoseLandmark.RIGHT_KNEE,
                 PoseLandmark.RIGHT_HIP,
                 PoseLandmark.RIGHT_SHOULDER,
-                140.0
+                145.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 140.0
+                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 145.0
+            ),
+            TargetShape(
+                PoseLandmark.LEFT_KNEE,
+                PoseLandmark.LEFT_HIP,
+                PoseLandmark.LEFT_SHOULDER,
+                145.0
+            ),
+            TargetShape(
+                PoseLandmark.LEFT_SHOULDER, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_HEEL, 145.0
             ),
         )
     )
@@ -114,10 +116,19 @@ class ExerciseClassification(
                 PoseLandmark.RIGHT_KNEE,
                 PoseLandmark.RIGHT_HIP,
                 PoseLandmark.RIGHT_SHOULDER,
-                10.0
+                60.0
             ),
             TargetShape(
-                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 10.0
+                PoseLandmark.RIGHT_SHOULDER, PoseLandmark.RIGHT_HIP, PoseLandmark.RIGHT_HEEL, 60.0
+            ),
+            TargetShape(
+                PoseLandmark.LEFT_KNEE,
+                PoseLandmark.LEFT_HIP,
+                PoseLandmark.LEFT_SHOULDER,
+                60.0
+            ),
+            TargetShape(
+                PoseLandmark.LEFT_SHOULDER, PoseLandmark.LEFT_HIP, PoseLandmark.LEFT_HEEL, 60.0
             ),
         )
     )

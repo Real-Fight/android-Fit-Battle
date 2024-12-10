@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,8 +49,10 @@ import androidx.navigation.NavController
 import com.qpeterp.fitbattle.R
 import com.qpeterp.fitbattle.application.MyApplication
 import com.qpeterp.fitbattle.domain.model.train.TrainType
+import com.qpeterp.fitbattle.domain.model.user.Quest
 import com.qpeterp.fitbattle.domain.model.user.QuestType
 import com.qpeterp.fitbattle.presentation.extensions.fitBattleClickable
+import com.qpeterp.fitbattle.presentation.extensions.shimmerEffect
 import com.qpeterp.fitbattle.presentation.features.main.home.viewmodel.HomeViewModel
 import com.qpeterp.fitbattle.presentation.theme.Colors
 
@@ -58,195 +61,343 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val screenScrollState = rememberScrollState()
-    val challengeScrollState = rememberScrollState()
-    val isLoading = viewModel.isLoading.collectAsState().value
-    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.getQuest()
+        viewModel.loadData()
     }
 
-    if (!isLoading) {
-        val quest = viewModel.quest.value!!
+    if (uiState.isLoading) {
+        ShimmerHomeContent()
+    } else {
+        HomeContent(
+            quest = uiState.quest ?: Quest("운동한판 2회 (0/2)", false, QuestType.MATCH),
+            navController = navController
+        )
+    }
+}
 
-        val questTypeIcon = when (quest.questType) {
-            QuestType.MATCH -> painterResource(R.drawable.ic_strength)
-            QuestType.SQUAT -> painterResource(R.drawable.ic_muclse)
-            QuestType.PUSHUP -> painterResource(R.drawable.ic_muclse)
-            QuestType.SITUP -> painterResource(R.drawable.ic_muclse)
-            QuestType.WIN -> painterResource(R.drawable.ic_strength)
-            QuestType.SITUPPERONEGAME -> painterResource(R.drawable.ic_muclse)
-            QuestType.SQUATPERONEGAME -> painterResource(R.drawable.ic_muclse)
-            QuestType.PUSHUPPERONEGAME -> painterResource(R.drawable.ic_muclse)
-        }
-        Column(
+@Composable
+private fun HomeContent(
+    quest: Quest,
+    navController: NavController
+) {
+    val screenScrollState = rememberScrollState()
+    val challengeScrollState = rememberScrollState()
+    val context = LocalContext.current
+
+    val questTypeIcon = when (quest.questType) {
+        QuestType.MATCH -> painterResource(R.drawable.ic_strength)
+        QuestType.SQUAT -> painterResource(R.drawable.ic_muclse)
+        QuestType.PUSHUP -> painterResource(R.drawable.ic_muclse)
+        QuestType.SITUP -> painterResource(R.drawable.ic_muclse)
+        QuestType.WIN -> painterResource(R.drawable.ic_strength)
+        QuestType.SITUPPERONEGAME -> painterResource(R.drawable.ic_muclse)
+        QuestType.SQUATPERONEGAME -> painterResource(R.drawable.ic_muclse)
+        QuestType.PUSHUPPERONEGAME -> painterResource(R.drawable.ic_muclse)
+    }
+    Column(
+        modifier = Modifier
+            .verticalScroll(
+                state = screenScrollState,
+            ),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Box(
             modifier = Modifier
-                .verticalScroll(
-                    state = screenScrollState,
-                ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .background(Colors.White, RoundedCornerShape(12.dp))
         ) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .background(Colors.White, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 18.dp)
+                    .padding(top = 16.dp),
             ) {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 18.dp)
-                        .padding(top = 16.dp),
+                Text(
+                    text = "오늘의 퀘스트",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Colors.Black
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "오늘의 퀘스트",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Colors.Black
-                    )
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = questTypeIcon,
-                                contentDescription = "Today mission fit type image",
-                                modifier = Modifier.size(52.dp),
-                                tint = Colors.LightPrimaryColor
-                            )
-                            Text(
-                                text = quest.message,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Colors.Black
-                            )
-                        }
+                        Icon(
+                            painter = questTypeIcon,
+                            contentDescription = "Today mission fit type image",
+                            modifier = Modifier.size(52.dp),
+                            tint = Colors.LightPrimaryColor
+                        )
+                        Text(
+                            text = quest.message,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Colors.Black
+                        )
+                    }
 
-                        TodayMissionButton(
-                            isCompleted = quest.completed
-                        ) {
-                            // TODO: 운동 dialog 띄우기
-                        }
+                    TodayMissionButton(
+                        isCompleted = quest.completed
+                    ) {
+                        // TODO: 운동 dialog 띄우기
                     }
                 }
             }
+        }
 
+        Text(
+            text = "챌린지",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Colors.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .horizontalScroll(
+                    state = challengeScrollState,
+                )
+                .padding(horizontal = 20.dp)
+        ) {
+            ChallengeCard(
+                mainColor = Colors.LightPrimaryColor,
+                subColor = Colors.LightPrimaryColorDark,
+                title = "개발자를\n이겨라!",
+                eventDate = "챌린지 기간 : 11월 30일 ~ 12월 30일",
+                content = "개발자의 기록을\n" +
+                        "뛰어넘어,\n" +
+                        "강함을 증명하세요!"
+            ) {
+
+            }
+            ChallengeCard(
+                mainColor = Color(0xFFF0B343),
+                subColor = Color(0xFFBE7F00),
+                title = "운동의 신",
+                eventDate = "챌린지 기간 : 11월 20일 ~ 12월 12일",
+                content = "기간 내에\n" +
+                        "누적 운동 횟수\n" +
+                        "1500회에 도전하세요!"
+            ) {
+                // Open the URL when the text is clicked
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://excessive-cashew-b68.notion.site/11-13d20279f6ea805a86daee7904abb48f?pvs=73")
+                )
+                context.startActivity(intent)
+            }
+        }
+
+        Text(
+            text = "훈련",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Colors.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        )
+
+        Column {
             Text(
-                text = "챌린지",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
+                text = "근력",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
                 color = Colors.Black,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 16.dp)
             )
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier
-                    .horizontalScroll(
-                        state = challengeScrollState,
-                    )
-                    .padding(horizontal = 20.dp)
+            TrainingCard(
+                icon = painterResource(R.drawable.ic_muclse),
+                title = "푸쉬업 훈련"
             ) {
-                ChallengeCard(
-                    mainColor = Colors.LightPrimaryColor,
-                    subColor = Colors.LightPrimaryColorDark,
-                    title = "개발자를\n이겨라!",
-                    eventDate = "챌린지 기간 : 11월 30일 ~ 12월 30일",
-                    content = "개발자의 기록을\n" +
-                            "뛰어넘어,\n" +
-                            "강함을 증명하세요!"
-                ) {
-
-                }
-                ChallengeCard(
-                    mainColor = Color(0xFFF0B343),
-                    subColor = Color(0xFFBE7F00),
-                    title = "운동의 신",
-                    eventDate = "챌린지 기간 : 11월 20일 ~ 12월 12일",
-                    content = "기간 내에\n" +
-                            "누적 운동 횟수\n" +
-                            "1500회에 도전하세요!"
-                ) {
-                    // Open the URL when the text is clicked
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://excessive-cashew-b68.notion.site/11-13d20279f6ea805a86daee7904abb48f?pvs=73"))
-                    context.startActivity(intent)
-                }
+                MyApplication.prefs.trainType = TrainType.PUSH_UP.label
+                navController.navigate("train")
             }
 
-            Text(
-                text = "훈련",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Colors.Black,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
+            TrainingCard(
+                icon = painterResource(R.drawable.ic_muclse),
+                title = "스쿼트 훈련"
+            ) {
+                MyApplication.prefs.trainType = TrainType.SQUAT.label
+                navController.navigate("train")
+            }
 
-            Column {
-                Text(
-                    text = "근력",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Colors.Black,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(bottom = 16.dp)
-                )
-
-                TrainingCard(
-                    icon = painterResource(R.drawable.ic_muclse),
-                    title = "푸쉬업 훈련"
-                ) {
-                    MyApplication.prefs.trainType = TrainType.PUSH_UP.label
-                    navController.navigate("train")
-                }
-
-                TrainingCard(
-                    icon = painterResource(R.drawable.ic_muclse),
-                    title = "스쿼트 훈련"
-                ) {
-                    MyApplication.prefs.trainType = TrainType.SQUAT.label
-                    navController.navigate("train")
-                }
-
-                TrainingCard(
-                    icon = painterResource(R.drawable.ic_muclse),
-                    title = "윗몸 일으키기 훈련"
-                ) {
-                    MyApplication.prefs.trainType = TrainType.SIT_UP.label
-                    navController.navigate("train")
-                }
-
-//                Text(
-//                    text = "체력",
-//                    fontSize = 14.sp,
-//                    fontWeight = FontWeight.Medium,
-//                    color = Colors.Black,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 24.dp)
-//                        .padding(bottom = 16.dp)
-//                )
-//
-//                TrainingCard(
-//                    icon = painterResource(R.drawable.ic_stamina),
-//                    title = "달리기 훈련"
-//                ) {
-//
-//                }
+            TrainingCard(
+                icon = painterResource(R.drawable.ic_muclse),
+                title = "윗몸 일으키기 훈련"
+            ) {
+                MyApplication.prefs.trainType = TrainType.SIT_UP.label
+                navController.navigate("train")
             }
         }
     }
 }
+
+@Composable
+fun ShimmerHomeContent() {
+    val screenScrollState = rememberScrollState()
+    val challengeScrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier
+            .verticalScroll(
+                state = screenScrollState,
+            ),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // "오늘의 퀘스트" 섹션
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .background(Colors.White, RoundedCornerShape(12.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 18.dp)
+                    .padding(top = 16.dp),
+            ) {
+                // 제목 Shimmer
+                Box(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(20.dp)
+                        .background(Colors.GrayLight)
+                        .shimmerEffect()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 아이콘 Shimmer
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp)
+                                .background(Colors.GrayLight)
+                                .shimmerEffect()
+                        )
+
+                        // 텍스트 Shimmer
+                        Box(
+                            modifier = Modifier
+                                .width(180.dp)
+                                .height(16.dp)
+                                .background(Colors.GrayLight)
+                                .shimmerEffect()
+                        )
+                    }
+
+                    // 버튼 Shimmer
+                    Box(
+                        modifier = Modifier
+                            .width(80.dp)
+                            .height(36.dp)
+                            .background(Colors.GrayLight)
+                            .shimmerEffect()
+                    )
+                }
+            }
+        }
+
+        // "챌린지" 섹션
+        Text(
+            text = "챌린지",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Colors.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .horizontalScroll(
+                    state = challengeScrollState,
+                )
+                .padding(horizontal = 20.dp)
+        ) {
+            repeat(2) {
+                // 챌린지 카드 Shimmer
+                Box(
+                    modifier = Modifier
+                        .width(240.dp)
+                        .height(120.dp)
+                        .background(Colors.GrayLight, RoundedCornerShape(12.dp))
+                        .shimmerEffect()
+                )
+            }
+        }
+
+        // "훈련" 섹션
+        Text(
+            text = "훈련",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Colors.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        )
+
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp)
+        ) {
+            repeat(3) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // 아이콘 Shimmer
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .background(Colors.GrayLight)
+                            .shimmerEffect()
+                    )
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // 텍스트 Shimmer
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(16.dp)
+                            .background(Colors.GrayLight)
+                            .shimmerEffect()
+                    )
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun TodayMissionButton(
